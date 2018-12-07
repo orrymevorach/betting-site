@@ -34,10 +34,8 @@ class App extends React.Component {
       loginEmail: '',
       loginPassword: '',
       // New Account Inputs
-      newTitle: '',
       newFirstName: '',
       newLastName: '',
-      newBirthdayMonth: '',
       newBirthdayDay: '',
       newBirthdayYear: '',
       newUsername: '',
@@ -52,7 +50,10 @@ class App extends React.Component {
       // Place Bet Functionality
       bettingInput: '',
       monetaryValueOfBet: '',
-      allBets: []
+      monthBetComplete: '',
+      dayBetComplete: '',
+      yearBetComplete: '',
+      allBets: [],
     }
 
     this.handleChange = this.handleChange.bind(this)
@@ -70,37 +71,6 @@ class App extends React.Component {
     })
   }
 
-  acceptBet(e) {
-    e.preventDefault()
-    let currentBets = this.state.allBets
-    const allBetsCopy = []
-    
-    const betText = e.target[0].value
-    const dollarAmount = e.target[1].value
-
-    const newBet = {
-      person: '',
-      bet: betText,
-      value: dollarAmount
-    }
-
-    if (currentBets.length <= 0) {
-      allBetsCopy.push(newBet)
-    }
-    else {
-      for (let i = 0; i < currentBets.length; i++) {
-        const  pastBet = currentBets[i]
-        allBetsCopy.push(pastBet)
-      }
-      allBetsCopy.push(newBet)
-    }
-
-    this.setState({
-      allBets: allBetsCopy
-    })
-    
-  }
-  
   loginWithFacebook() {
     const provider = new firebase.auth.FacebookAuthProvider();
     
@@ -166,7 +136,14 @@ class App extends React.Component {
   }
 
   // this function is only required the first time a user logs in with facebook
-  facebookAdditionalUserInformation(username, title, month, day, year) {
+  facebookAdditionalUserInformation(e) {
+    e.preventDefault();
+    const title = e.target[0].value
+    const username = e.target[1].value
+    const month = e.target[2].value
+    const day = e.target[3].value
+    const year = e.target[4].value
+
     // userProfile in state was updated just a second ago when user logged in for the first time
     const userID = this.state.userProfile.userID
 
@@ -221,7 +198,19 @@ class App extends React.Component {
     })
   }
 
-  createAccount(email, password, title, firstName, lastName, month, day, year, username) {
+  createAccount(e) {
+    e.preventDefault();
+    const el = e.target
+    const title = el[0].value
+    const firstName = el[1].value
+    const lastName = el[2].value
+    const month = el[3].value
+    const day = el[4].value
+    const year = el[5].value
+    const username = el[6].value
+    const email = el[7].value
+    const password = el[8].value
+    
     firebase.auth().createUserWithEmailAndPassword(email, password).then((user) => {
       
       const userProfile = 
@@ -251,32 +240,24 @@ class App extends React.Component {
     })
   }
 
-  loginWithEmail(email, password) {
+  loginWithEmail(e) {
+    e.preventDefault();
+    const email = e.target[0].value
+    const password = e.target[1].value
+
     firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
       const userID = user.user.uid
       const dbRefUser = firebase.database().ref(`users/${userID}`)
       
       let userProfile =
       {
-        // "title": '',
-        // "firstName":'',
-        // "lastName": '',
-        // "birthday": '',
         "username": '',
-        // "email": '',
         "userID": '',
-        // "loginMethod": ''
       }
       dbRefUser.on('value', snapshot => {
         const data = snapshot.val()
-        // userProfile.title = data.title
-        // userProfile.firstName = data.firstName
-        // userProfile.lastName = data.lastName
-        // userProfile.birthday = data.birthday
         userProfile.username = data.username
-        // userProfile.email = data.email
         userProfile.userID = data.userID
-        // userProfile.loginMethod = data.loginMethod
         
         this.setState({
           loggedInWithEmail: true,
@@ -289,6 +270,48 @@ class App extends React.Component {
       console.log(err)
       alert(`${err.code}: ${err.message}`)
     })
+  }
+
+  acceptBet(e) {
+    e.preventDefault();
+
+    const el = e.target
+    const betText = el[0].value
+    const amount = el[1].value
+    const month = el[2].value
+    const day = el[3].value
+    const year = el[4].value
+
+    const newBet = {
+      person: '',
+      bet: betText,
+      value: amount,
+      dateBetExpires: `${month} ${day} ${year}`
+    }
+
+    let currentBets = this.state.allBets
+    const allBetsCopy = []
+
+    if (currentBets.length <= 0) {
+      allBetsCopy.push(newBet)
+    }
+    else {
+      for (let i = 0; i < currentBets.length; i++) {
+        const pastBet = currentBets[i]
+        allBetsCopy.push(pastBet)
+      }
+      allBetsCopy.push(newBet)
+    }
+
+    this.setState({
+      allBets: allBetsCopy,
+      bettingInput: '',
+      monetaryValueOfBet: '',
+      monthBetComplete: '',
+      dayBetComplete: '',
+      yearBetComplete: '',
+    })
+
   }
 
   render() {
@@ -315,10 +338,8 @@ class App extends React.Component {
               userProfile={this.state.userProfile}
               // New Account Props
               createAccount={this.createAccount}
-              newTitle={this.state.newTitle}
               newFirstName={this.state.newFirstName}
               newLastName={this.state.newLastName}
-              newBirthdayMonth={this.state.newBirthdayMonth}
               newBirthdayDay={this.state.newBirthdayDay}
               newBirthdayYear={this.state.newBirthdayYear}
               newUsername={this.state.newUsername}
@@ -328,15 +349,19 @@ class App extends React.Component {
               showFacebookModal={this.state.showFacebookModal}
               facebookAdditionalUserInformation={this.facebookAdditionalUserInformation}
             />
-            {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ?
+            {/* {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ? */}
               <PlaceBet 
                 handleChange={this.handleChange}
+                acceptBet={this.acceptBet}
                 bettingInput={this.state.bettingInput}
                 monetaryValueOfBet={this.state.monetaryValueOfBet}
                 allBets={this.state.allBets}
+                monthBetComplete={this.state.monthBetComplete}
+                dayBetComplete={this.state.dayBetComplete}
+                yearBetComplete={this.state.yearBetComplete}
               />
-              : null
-            }
+              {/* : null */}
+            {/* } */}
             
             <Tabs />
             <SectionExpiringBets />

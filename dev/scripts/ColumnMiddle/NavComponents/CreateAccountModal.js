@@ -1,29 +1,33 @@
 import React from 'react';
 
-const CreateAccountModal = (props) => {
-    function createAccount(e) {
-        e.preventDefault();
-        const formElement = e.target
-        const title = formElement[0].value
-        const firstName = formElement[1].value
-        const lastName = formElement[2].value
-        const month = formElement[3].value
-        const day = formElement[4].value
-        const year = formElement[5].value
-        const username = formElement[6].value
-        const email = formElement[7].value
-        const password = formElement[8].value
-        
-        props.createAccount(email, password, title, firstName, lastName, month, day, year, username)
-    }
-
-    if(props.loggedInWithEmail === true) {
+const CreateAccountModal = (
+    { createAccount,
+    handleChange,
+    newFirstName,
+    newLastName,
+    newBirthdayDay,
+    newBirthdayYear,
+    newUsername,
+    newEmail,
+    newPassword,
+    loggedInWithEmail }
+) => {
+    // Hide Modal Once User Is Logged In
+    if(loggedInWithEmail === true) {
         $('.create-account-modal').addClass('none')
     }
 
+    // Close Modal when click the x 
     function closeModal() {
         $('.create-account-modal').addClass('none')
     }
+
+    // Clicking 'Escape' Closes Modal
+    $(document).on('keydown', function (e) {
+        if (e.which === 27) {
+            closeModal()
+        }
+    })
 
     return (
         <div className="create-account-modal label-outside none">
@@ -33,7 +37,7 @@ const CreateAccountModal = (props) => {
                         <i className="fas fa-times"></i>
                     </div>
                     <h1 className="modal-header">create account</h1>
-                    <form action="#" onSubmit={createAccount}>
+                    <form action="#" onSubmit={(e) => createAccount(e)}>
                         <div className="modal-row modal-row1 column">
                             <label htmlFor="newTitle">Title</label>
                             <div className="select-arrow-container">
@@ -51,8 +55,8 @@ const CreateAccountModal = (props) => {
                                 <input
                                     type="text"
                                     name="newFirstName"
-                                    value={props.newFirstName}
-                                    onChange={props.handleChange}
+                                    value={newFirstName}
+                                    onChange={handleChange}
                                  />
                             </div>
                             <div className="newLastName column">
@@ -60,16 +64,16 @@ const CreateAccountModal = (props) => {
                                 <input
                                     type="text"
                                     name="newLastName"
-                                    value={props.newLastName}
-                                    onChange={props.handleChange}
+                                    value={newLastName}
+                                    onChange={handleChange}
                                  />
                             </div>
                         </div>
                         <div className="modal-row modal-row3 column">
                             <label htmlFor="new-date-of-birth">Date of Birth</label>
-                            <div className="birthday-inputs">
+                            <div className="date-inputs">
                                 <div className="select-arrow-container">
-                                    <select name="newBirthdayMonth">
+                                    <select name="newBirthdayMonth" className="month-input">
                                         <option value="January">January</option>
                                         <option value="February">February</option>
                                         <option value="March">March</option>
@@ -86,18 +90,20 @@ const CreateAccountModal = (props) => {
                                     <i className="fas fa-angle-down birthday-arrow"></i>
                                 </div>
                                 <input
+                                    className="day-input"
                                     type="number" 
                                     name="newBirthdayDay" 
-                                    value={props.newBirthdayDay}
+                                    value={newBirthdayDay}
                                     placeholder="Day"
-                                    onChange={props.handleChange}
+                                    onChange={handleChange}
                                  />
                                 <input
+                                    className="year-input"
                                     type="numer" 
                                     name="newBirthdayYear" 
-                                    value={props.newBirthdayYear}
+                                    value={newBirthdayYear}
                                     placeholder="Year"
-                                    onChange={props.handleChange}
+                                    onChange={handleChange}
                                  />
                             </div>
                         </div>
@@ -105,9 +111,9 @@ const CreateAccountModal = (props) => {
                             <label htmlFor="newusername">username</label>
                             <input
                                 type="text" 
-                                name="newusername"
-                                value={props.newusername}
-                                onChange={props.handleChange}
+                                name="newUsername"
+                                value={newUsername}
+                                onChange={handleChange}
                              />
                         </div>
                         <div className="modal-row modal-row5 column">
@@ -115,8 +121,8 @@ const CreateAccountModal = (props) => {
                             <input
                                 type="email" 
                                 name="newEmail" 
-                                value={props.newEmail}
-                                onChange={props.handleChange}
+                                value={newEmail}
+                                onChange={handleChange}
                              />
                         </div>
                         <div className="modal-row modal-row6 column">
@@ -124,8 +130,8 @@ const CreateAccountModal = (props) => {
                             <input
                                 type="password" 
                                 name="newPassword" 
-                                value={props.newPassword}
-                                onChange={props.handleChange}
+                                value={newPassword}
+                                onChange={handleChange}
                              />
                         </div>
                         <div className="modal-row modal-row7">

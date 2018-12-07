@@ -1,0 +1,27 @@
+.place-bet {
+    padding: 25px;
+    input[name=bettingInput] {
+        width: 100%;
+    }
+    .row {
+        margin: 25px 0;
+    }
+
+    .monetary-value, 
+    .date-bet-complete {
+        display: flex;
+        flex-direction: column;
+    }
+    .monetary-value {
+        float: left;
+    }
+    .date-bet-complete {
+        float: right;
+    }
+    button {
+        width: 200px;
+        display: block;
+        margin: 0 auto;
+    }
+
+}

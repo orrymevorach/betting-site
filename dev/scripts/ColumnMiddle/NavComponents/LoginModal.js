@@ -1,7 +1,20 @@
 import React from 'react';
 import FacebookModal from './FacebookModal';
 
-const LoginModal = (props) => {
+const LoginModal = (
+    { handleChange,
+    loginEmail,
+    loginPassword,
+    loginWithFacebook,
+    loginWithEmail,
+    newUsername,
+    newBirthdayDay,
+    newBirthdayYear,
+    showFacebookModal,
+    facebookAdditionalUserInformation,
+    loggedInWithFacebook }
+) => {
+
     $('input').on('focusin', function(e) {
         const parentElement = e.target.parentElement.className
         $(`.${parentElement}`).addClass('input-focus')
@@ -12,14 +25,6 @@ const LoginModal = (props) => {
         $(`.${parentElement}`).removeClass('input-focus')
     })
 
-    function loginWithEmail(e) {
-        e.preventDefault();
-        const email = e.target[0].value
-        const password = e.target[1].value
-
-        props.loginWithEmail(email, password)
-    }
-
     function closeModal() {
         $('.login-modal').addClass('none')
     }
@@ -29,27 +34,27 @@ const LoginModal = (props) => {
         }
     })
 
-    function showFacebookModal() {
+    function displayFacebookModal() {
         $('.login-modal').addClass('none')
         $('.facebook-modal').removeClass('none')
     }
 
-    if (props.showFacebookModal === true) {
-        showFacebookModal()
+    if (showFacebookModal === true) {
+        displayFacebookModal()
     }
 
-    if(props.loggedInWithFacebook === true) {
+    if(loggedInWithFacebook === true) {
         closeModal();
     }
 
     return (
         <div>
             <FacebookModal 
-                handleChange={props.handleChange}
-                newUsername={props.newUsername}
-                newTitle={props.newTitle}
-                loginWithFacebook={props.loginWithFacebook}
-                facebookAdditionalUserInformation={props.facebookAdditionalUserInformation}
+                handleChange={handleChange}
+                newUsername={newUsername}
+                newBirthdayDay={newBirthdayDay}
+                newBirthdayYear={newBirthdayYear}
+                facebookAdditionalUserInformation={facebookAdditionalUserInformation}
             />
             <div className="login-modal label-inside none">
                 <div className="overlay">
@@ -58,14 +63,14 @@ const LoginModal = (props) => {
                             <i className="fas fa-times"></i>
                         </div>
                         <h1 className="modal-header">Time To Play</h1>
-                        <form action="#" onSubmit={loginWithEmail}>
+                        <form action="#" onSubmit={(e) => loginWithEmail(e)}>
                             <div className="input-container">
                                 <label htmlFor="loginPassword">Email*</label>
                                 <input 
                                     type="email" 
                                     name="loginEmail"
-                                    value={props.loginEmail}
-                                    onChange={props.handleChange}
+                                    value={loginEmail}
+                                    onChange={handleChange}
                                     required
                                 />
                             </div>
@@ -74,8 +79,8 @@ const LoginModal = (props) => {
                                 <input 
                                     type="password" 
                                     name="loginPassword"
-                                    value={props.loginPassword}
-                                    onChange={props.handleChange}
+                                    value={loginPassword}
+                                    onChange={handleChange}
                                     required 
                             />
                             </div>
@@ -84,7 +89,7 @@ const LoginModal = (props) => {
                         <div className="login-or">
                             <p>or</p>
                         </div>
-                        <button className="modal-button login-with-facebook" onClick={props.loginWithFacebook}>Log In With Facebook</button>
+                        <button className="modal-button login-with-facebook" onClick={loginWithFacebook}>Log In With Facebook</button>
                     </div>
                 </div>
             </div>

@@ -182,16 +182,16 @@ input:required {
     }
 }
 
-.birthday-inputs {
+.date-inputs {
     display: flex;
-    select[name=newBirthdayMonth] {
+    .month-input {
         width: 100%;
     }
-    input[name=newBirthdayDay],
-    input[name=newBirthdayYear] {
+    .day-input,
+    .year-input {
         width: 32%;
     }
-    input[name=newBirthdayDay] {
+    .day-input {
         margin: 0 1%;
     }
     svg.birthday-arrow {
