@@ -1,0 +1,67 @@
+@import 'setup';
+@import 'mixins';
+@import 'homeNav';
+@import 'modals';
+
+
+body {
+    background-color: #152a47;
+    color: white;
+}
+
+// font-family: 'Archivo Black', sans-serif;
+// font-family: 'Archivo Narrow', sans-serif;
+// font-family: 'Archivo', sans-serif;
+
+h1 {
+    font-family: 'Archivo', sans-serif;
+}
+
+h1,h2,h3,h4,h5,h6,p,a {
+    margin: 0;
+    padding: 0;
+}
+
+.home-container {
+    display: flex;
+}
+
+.home-col1 {
+    width: 200px;
+}
+.home-col2 {
+    width: 800px;
+}
+
+.home-col3 {
+    width: 300px;
+}
+
+.overlay {
+    position: absolute;
+    background: rgba(21,42,71,0.8);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.display {
+    display: block;
+}
+
+.none {
+    display: none;
+}
+
+.stopscroll {
+    height: 100%;
+    overflow: hidden;
+}
+
+.column {
+    display: flex;
+    flex-direction: column
+}
+
+

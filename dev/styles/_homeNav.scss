@@ -1,0 +1,35 @@
+nav.home-nav {
+    ul {
+        list-style: none;
+    }
+    .nav-left {
+        float: left;
+    }
+    .nav-right {
+        float: right;
+        display: flex;
+    }
+
+    .login-button {
+        background-color: $darkBlue;
+        color: #fff;
+    }
+
+    .join-now-button {
+        background-color: #fff;
+        color: #0d7fe1;
+        border-radius: 3px;
+    }
+    .login-button,
+    .join-now-button {
+        border: none;
+        margin-right: 15px;
+        cursor: pointer;
+    }
+    .home, 
+    .login-button,
+    .join-now-button,
+    .nav-greeting {
+        padding: 10px;
+    }
+}
