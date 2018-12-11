@@ -43,56 +43,9 @@ const PlaceBet = (
                         <label htmlFor="date-bet-complete">What Day Does Your Bet Take Place</label>
                         <div className="date-inputs">
                             <div className="select-arrow-container">
-                                <select name="monthBetComplete" className="month-input">
-                                    {todaysMonth === 1 ? 
-                                        <option value="1" selected="selected">January</option>
-                                        : <option value="1">January</option>
-                                    }
-                                    {todaysMonth === 2 ?
-                                        <option value="2" selected="selected">February</option>
-                                        : <option value="2">February</option>
-                                    }
-                                    {todaysMonth === 3 ?
-                                        <option value="3" selected="selected">March</option>
-                                        : <option value="3">March</option>
-                                    }
-                                    {todaysMonth === 4 ?
-                                        <option value="4" selected="selected">April</option>
-                                        : <option value="4">April</option>
-                                    }
-                                    {todaysMonth === 5 ?
-                                        <option value="5" selected="selected">May</option>
-                                        : <option value="5">May</option>
-                                    }
-                                    {todaysMonth === 6 ?
-                                        <option value="6" selected="selected">June</option>
-                                        : <option value="6">June</option>
-                                    }
-                                    {todaysMonth === 7 ?
-                                        <option value="7" selected="selected">July</option>
-                                        : <option value="7">July</option>
-                                    }
-                                    {todaysMonth === 8 ?
-                                        <option value="8" selected="selected">August</option>
-                                        : <option value="8">August</option>
-                                    }
-                                    {todaysMonth === 9 ?
-                                        <option value="9" selected="selected">September</option>
-                                        : <option value="9">September</option>
-                                    }
-                                    {todaysMonth === 10 ?
-                                        <option value="10" selected="selected">October</option>
-                                        : <option value="10">October</option>
-                                    }
-                                    {todaysMonth === 11 ?
-                                        <option value="11" selected="selected">November</option>
-                                        : <option value="11">November</option>
-                                    }
-                                    {todaysMonth === 12 ?
-                                        <option value="12" selected="selected">December</option>
-                                        : <option value="12">December</option>
-                                    }
-                                    {/* <option value="2">February</option>
+                                <select name="monthBetComplete" className="month-input" defaultValue={todaysMonth}>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
                                     <option value="3">March</option>
                                     <option value="4">April</option>
                                     <option value="5">May</option>
@@ -102,7 +55,7 @@ const PlaceBet = (
                                     <option value="9">September</option>
                                     <option value="10">October</option>
                                     <option value="11">November</option>
-                                    <option value="12">December</option> */}
+                                    <option value="12">December</option>
                                 </select>
                                 <i className="fas fa-angle-down birthday-arrow"></i>
                             </div>
