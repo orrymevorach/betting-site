@@ -24,18 +24,21 @@ const HomeNav = (
     facebookAdditionalUserInformation }
 ) => {
 
-    function login() {
+    function showLoginModal() {
         $('.login-modal').removeClass('none')
     }
+
+    function showCreateAccountModal() {
+        $('.create-account-modal').removeClass('none')
+    }
+
+    // When user is logged in with Facebook, hide all modals
     if(loggedInWithFacebook === true) {
         $('.facebook-modal').addClass('none')
         $('body').removeClass('stopscroll')
     }
 
-    function createAccount() {
-        $('.create-account-modal').removeClass('none')
-    }
-    
+    // When user is logged in with Email, hide all modals
     if(loggedInWithEmail === true) {
         $('.create-account-modal').addClass('none')
         $('.login-modal').addClass('none')
@@ -75,13 +78,13 @@ const HomeNav = (
                 </div>
                 {loggedInWithFacebook === false && loggedInWithEmail === false ? 
                     <div className="nav-right">
-                        <li><button className="login-button" onClick={login}>Login</button></li>
-                        <li><button className="join-now-button" onClick={createAccount}>Join Now</button></li>
+                        <li><button className="login-button" onClick={showLoginModal}>Login</button></li>
+                        <li><button className="join-now-button" onClick={showCreateAccountModal}>Join Now</button></li>
                     </div>
                 : loggedInWithFacebook === true  || loggedInWithEmail === true ?
                     <div className="nav-right">
                         <li><h3 className="nav-greeting">Welcome {userProfile.username}</h3></li>
-                        <li><button onClick={logout}>Log Out</button></li>
+                        <li><button className="join-now-button" onClick={logout}>Log Out</button></li>
                     </div>
                 : null
                 }

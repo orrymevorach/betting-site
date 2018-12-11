@@ -1,5 +1,6 @@
 .place-bet {
     padding: 25px;
+    border: 2px solid $lightBlue;
     input[name=bettingInput] {
         width: 100%;
     }
@@ -22,6 +23,6 @@
         width: 200px;
         display: block;
         margin: 0 auto;
+        position: relative;
     }
-
 }

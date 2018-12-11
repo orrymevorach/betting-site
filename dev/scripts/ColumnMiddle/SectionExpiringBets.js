@@ -1,9 +1,23 @@
 import React from 'react';
 
-const SectionExpiringBets = () => {
+const SectionExpiringBets = ({ allBets }) => {
     return (
         <div>
-            <h1>SectionExpiringBets</h1>
+            <ul>
+                {allBets.map(bet => {
+                    return (
+                        <li>
+                            {bet.betText}
+                            <br></br>
+                            {bet.amount} tokens
+                            <br></br>
+                            {bet.expires}
+                            <br></br>
+                            {bet.userPlaced}
+                        </li>
+                    )
+                })}
+            </ul>
         </div>
     )
 }

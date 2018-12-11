@@ -1,0 +1,61 @@
+.betslip-main-tab {
+    background: #fff;
+    color: $darkBlue;
+    width: 33.3%;
+    text-align: center;
+    padding: 20px;
+    svg {
+        font-size: 20px;
+    }
+}
+
+ul.betslip-tabs {
+    display: flex;
+    li.tab {
+        background-color: #fff;
+        width: 100%;
+        text-align: center;
+        padding: 15px 0;
+        a {
+            color: $darkBlue;
+        }
+    }
+}
+
+.bets-section {
+    background-color: rgb(228,232,238);
+    color: $darkBlue;
+    padding: 20px 20px 0 0;
+}
+
+.active-bet-tab {
+    color: $lightBlue;
+    text-decoration: underline;
+}
+
+.bet-text {
+    display: flex;
+}
+
+.bet-text-left {
+    width: 33%;
+}
+
+.bet-text-right {
+    width: 66%;
+}
+
+.bets-section {
+    padding: 15px;
+}
+
+li.bet {
+    padding-bottom: 20px;
+    margin: 20px 0;
+    border-bottom: 1px solid $darkBlue;
+}
+
+.today {
+    color: green;
+    font-weight: 500;
+}

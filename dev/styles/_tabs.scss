@@ -1,0 +1,21 @@
+nav.tabs ul {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    a {
+        text-decoration: none;
+        color: #fff;
+    }
+    li.tab {
+        border: 2px solid white;
+        width: 100%;
+        text-align: center;
+        padding: 20px;
+        &:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+    }
+    .active-tab {
+        color: $lightBlue;
+    }
+}

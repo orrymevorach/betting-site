@@ -11,6 +11,7 @@ import SectionSports from './ColumnMiddle/SectionSports';
 import Tabs from './ColumnMiddle/Tabs';
 import BetSlip from './ColumnRight/BetSlip';
 import Footer from './Footer'
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 
 // Initialize Firebase
 const config = {
@@ -24,7 +25,14 @@ const config = {
 firebase.initializeApp(config);
 
 const dbRefUsers = firebase.database().ref('users')
+const dbRefBets = firebase.database().ref('allBets')
 
+// Todays Date
+const date = new Date();
+const todaysYear = date.getFullYear();
+const todaysMonth = date.getMonth() + 1;
+const todaysDay = date.getDate();
+const todaysDate = `${todaysMonth}/${todaysDay}/${todaysYear}`;
 
 class App extends React.Component {
   constructor() {
@@ -50,19 +58,38 @@ class App extends React.Component {
       // Place Bet Functionality
       bettingInput: '',
       monetaryValueOfBet: '',
-      monthBetComplete: '',
       dayBetComplete: '',
       yearBetComplete: '',
       allBets: [],
     }
 
     this.handleChange = this.handleChange.bind(this)
-    this.acceptBet = this.acceptBet.bind(this)
     this.loginWithFacebook = this.loginWithFacebook.bind(this)
     this.logout = this.logout.bind(this)
     this.createAccount = this.createAccount.bind(this)
     this.loginWithEmail = this.loginWithEmail.bind(this)
     this.facebookAdditionalUserInformation = this.facebookAdditionalUserInformation.bind(this)
+    this.placeBet = this.placeBet.bind(this)
+  }
+
+  componentDidMount() {
+    // const allBetsArray = []
+
+    // dbRefBets.on('value', snapshot => {
+    //   const data = snapshot.val();
+      
+    //   for(let key in data) {
+    //     console.log(data[key])
+    //     allBetsArray.push(data[key])
+    //   }
+    // })
+    // console.log(allBetsArray)
+    // dbRefBets.set(allBetsArray)
+
+    // this.setState({
+    //   allBets: allBetsArray
+    // })
+
   }
 
   handleChange(e) {
@@ -77,11 +104,8 @@ class App extends React.Component {
     firebase.auth().signInWithPopup(provider).then(res => {
       // user information that we got from facebook
       const user = res.user
-      // userID
       const userID = user.uid
-      // email
       const userEmail = user.email
-      // displayName
       const displayName = user.displayName
       const fullName = displayName.split(' ')
       const firstName = fullName[0]
@@ -92,13 +116,36 @@ class App extends React.Component {
         // if user exists, update state to include username (to render) and userID (for firebase)
         // firebase has more user information but it is not currently needed for render
         if(snapshot.exists()) {
-
           const data = snapshot.val()
           const username = data.username
+          let userProfile;
           
-          let userProfile = {
-            "username": username,
-            "userID": userID,
+          // if bets have been made and exist within the object ...
+          if(data.bets) {
+            const activeBets = data.bets.activeBets
+            const inactiveBets = data.bets.inactiveBets
+            const expiredBets = data.bets.expiredBets
+            userProfile = {
+              "username": username,
+              "userID": userID,
+              "bets": {
+                "activeBets": activeBets,
+                "inactiveBets": inactiveBets,
+                "expiredBets": expiredBets
+              }
+            }
+          }
+          // if no best exist for the user ...
+          else {
+            userProfile = {
+              "username": username,
+              "userID": userID,
+              "bets": {
+                "activeBets":[],
+                "inactiveBets":[],
+                "expiredBets":[]
+              }
+            }
           }
 
           this.setState({
@@ -110,12 +157,12 @@ class App extends React.Component {
         }
         // if user does not exist...
         else {
-          // create an object including information provided by facebook, then ...
+          // create an object including the information provided by facebook. Other information is added in the facebokAdditionalUserInformation Function
           let userProfile = {
             "email": userEmail,
             "userID": userID,
             "firstName": firstName,
-            "lastName": lastName
+            "lastName": lastName,
           }
 
           // create a user in firebase and set the userProfile with current information
@@ -156,7 +203,12 @@ class App extends React.Component {
       "username": username,
       "email": '',
       "userID": userID,
-      "loginMethod": "facebook"
+      "loginMethod": "facebook",
+      "bets": {
+        "activeBets": [],
+        "inactiveBets": [],
+        "expiredBets": []
+      }
     }
 
     // retreive information that already exists in firebase ref and add it to the userProfile object
@@ -272,21 +324,31 @@ class App extends React.Component {
     })
   }
 
-  acceptBet(e) {
-    e.preventDefault();
-
-    const el = e.target
-    const betText = el[0].value
-    const amount = el[1].value
-    const month = el[2].value
-    const day = el[3].value
-    const year = el[4].value
-
+  renderToBetSlip(betText, amount, date) {
+    
+    // New Bet
     const newBet = {
-      person: '',
+      "text": betText,
+      "amount": amount,
+      "expires": date
+    }
+
+    // A new object copying exact values of UserProfile
+    let userProfile = Object.assign({}, this.state.userProfile);
+
+    // Add new bet to User Profile
+    userProfile.bets.activeBets.push(newBet)
+
+    // push to firebase
+    const userID = this.state.userProfile.userID
+    dbRefUsers.child(`${userID}`).child('bets').child('activeBets').set(userProfile.bets.activeBets)
+  }
+
+  renderToNewestBets(betText, amount, date) {
+    const newBet = {
       bet: betText,
       value: amount,
-      dateBetExpires: `${month} ${day} ${year}`
+      dateBetExpires: date
     }
 
     let currentBets = this.state.allBets
@@ -304,13 +366,71 @@ class App extends React.Component {
     }
 
     this.setState({
-      allBets: allBetsCopy,
       bettingInput: '',
       monetaryValueOfBet: '',
-      monthBetComplete: '',
       dayBetComplete: '',
       yearBetComplete: '',
     })
+  }
+
+  storeBetInFirebase(betText, amount, date) {
+    const userID = this.state.userProfile.userID
+    const username = this.state.userProfile.username
+    const timeDatePlaced = new Date();
+
+    console.log(timeDatePlaced)
+
+    const newBet = {
+      userPlaced: `${userID}/${username}`,
+      datePlaced: timeDatePlaced,
+      userAccepted: '',
+      dateAccepted: '',
+      betText: betText,
+      amount: amount,
+      expires: date
+    }
+
+    const allBetsArray = []
+
+    dbRefBets.on('value', snapshot => {
+      const data = snapshot.val();
+      for (let key in data) {
+        allBetsArray.push(data[key])
+      }
+    })
+
+    allBetsArray.push(newBet)
+
+    dbRefBets.set(allBetsArray)
+  }
+  placeBet(e) {
+    e.preventDefault();
+
+    const el = e.target
+    const betText = el[0].value
+    const amount = el[1].value
+    const month = el[2].value
+    const day = el[3].value
+    const year = el[4].value
+    // const monthinNumbers =
+    //   month.split(" ")[0] === 'January' ? 1
+    //   : month.split(" ")[0] === 'February' ? 2
+    //   : month.split(" ")[0] === 'March' ? 3
+    //   : month.split(" ")[0] === 'April' ? 4
+    //   : month.split(" ")[0] === 'May' ? 5
+    //   : month.split(" ")[0] === 'June' ? 6
+    //   : month.split(" ")[0] === 'July' ? 7
+    //   : month.split(" ")[0] === 'August' ? 8
+    //   : month.split(" ")[0] === 'September' ? 9
+    //   : month.split(" ")[0] === 'October' ? 10
+    //   : month.split(" ")[0] === 'November' ? 11
+    //   : month.split(" ")[0] === 'December' ? 12
+    //   : null
+    const dateInNumbers = `${month}/${day}/${year}`
+
+    this.renderToBetSlip(betText, amount, dateInNumbers)
+    this.renderToNewestBets(betText, amount, dateInNumbers)
+    this.storeBetInFirebase(betText, amount, dateInNumbers)
 
   }
 
@@ -349,28 +469,53 @@ class App extends React.Component {
               showFacebookModal={this.state.showFacebookModal}
               facebookAdditionalUserInformation={this.facebookAdditionalUserInformation}
             />
-            {/* {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ? */}
+            {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ?
               <PlaceBet 
                 handleChange={this.handleChange}
-                acceptBet={this.acceptBet}
+                placeBet={this.placeBet}
                 bettingInput={this.state.bettingInput}
                 monetaryValueOfBet={this.state.monetaryValueOfBet}
                 allBets={this.state.allBets}
-                monthBetComplete={this.state.monthBetComplete}
                 dayBetComplete={this.state.dayBetComplete}
                 yearBetComplete={this.state.yearBetComplete}
+                todaysMonth={todaysMonth}
+                todaysDay={todaysDay}
+                todaysYear={todaysYear}
               />
-              {/* : null */}
-            {/* } */}
+              : null
+            }
             
-            <Tabs />
-            <SectionExpiringBets />
-            <SectionSports />
-            <SectionNewestBets />
+            <Router>
+              <div>
+                <Tabs />
+
+                <Route path="/" exact render={() => {
+                  return (
+                    <SectionExpiringBets 
+                      allBets={this.state.allBets}
+                    />
+                  )
+                }} />
+                <Route path="/newestBets" exact render={() => {
+                  return (
+                    <SectionNewestBets />
+                  )
+                }} />
+              </div>
+            </Router>
 
           </div>
           <div className="home-col home-col3">
-            <BetSlip />
+            {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ?
+            <BetSlip 
+              userBets={this.state.userProfile.bets}
+              todaysDate={todaysDate}
+              todaysMonth={todaysMonth}
+              todaysDay={todaysDay}
+              todaysYear={todaysYear}
+            />
+            : null
+            }
           </div>
           
         </div> {/* Closing Home-Container */}

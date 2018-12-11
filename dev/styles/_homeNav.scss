@@ -1,4 +1,5 @@
 nav.home-nav {
+    margin: 20px 0;
     ul {
         list-style: none;
     }
@@ -13,13 +14,21 @@ nav.home-nav {
     .login-button {
         background-color: $darkBlue;
         color: #fff;
+        &:hover {
+            color: $lightBlue;
+        }
     }
 
     .join-now-button {
         background-color: #fff;
-        color: #0d7fe1;
+        color: $lightBlue;
         border-radius: 3px;
+        &:hover {
+            background-color: $darkBlue;
+            outline: 1px solid #fff;
+        }
     }
+
     .login-button,
     .join-now-button {
         border: none;

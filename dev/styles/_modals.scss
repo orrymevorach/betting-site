@@ -65,6 +65,9 @@ input:required {
 // Light Blue Button Background
 .light-blue {
     background-color: #0d7fe1;
+    &:hover {
+        background-color: #3492e4;
+    }
 }
 
 // Close Modal Icon (x)
@@ -179,6 +182,9 @@ input:required {
     }
     .login-with-facebook {
         background-color: #3b5998;
+        &:hover {
+            background-color: #6078ac;
+        }
     }
 }
 

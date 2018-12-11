@@ -3,7 +3,13 @@
 @import 'homeNav';
 @import 'modals';
 @import 'placeBet';
+@import 'tabs';
+@import 'betslip';
 
+h1,h2,h3,h4,h5,h6,p,a,ul,li {
+    margin: 0;
+    padding: 0;
+}
 
 body {
     background-color: #152a47;
@@ -18,10 +24,20 @@ h1 {
     font-family: 'Archivo', sans-serif;
 }
 
-h1,h2,h3,h4,h5,h6,p,a {
-    margin: 0;
-    padding: 0;
+h2, p {
+   font-family: 'Archivo Narrow', sans-serif; 
 }
+a {
+    text-decoration: none;
+    &:visited,
+    a:focus {
+        text-decoration: none;
+    }
+}
+ul {
+    list-style: none;
+}
+
 
 .home-container {
     display: flex;
@@ -32,10 +48,11 @@ h1,h2,h3,h4,h5,h6,p,a {
 }
 .home-col2 {
     width: 800px;
+    margin-right: 10px;
 }
 
 .home-col3 {
-    width: 300px;
+    width: 360px;
 }
 
 .overlay {
@@ -64,5 +81,8 @@ h1,h2,h3,h4,h5,h6,p,a {
     display: flex;
     flex-direction: column
 }
+
+
+
 
 
