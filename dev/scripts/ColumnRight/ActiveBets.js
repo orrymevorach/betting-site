@@ -7,7 +7,6 @@ const ActiveBets = (
     todaysDay,
     todaysYear
  }) => {
-console.log(todaysMonth, todaysDay, todaysYear)
     return (
         <ul>
             {userBets ?
@@ -55,34 +54,34 @@ console.log(todaysMonth, todaysDay, todaysYear)
                     else if (yearA === yearB && monthA > monthB) {
                         return 1;
                     }
-                    })
-                    .map((bet, i) => {
-                        const month = parseInt(bet.expires.split("/")[0])
-                        const day = parseInt(bet.expires.split("/")[1])
-                        const year = parseInt(bet.expires.split("/")[2])
+                })
+                .map((bet, i) => {
+                    const month = parseInt(bet.expires.split("/")[0])
+                    const day = parseInt(bet.expires.split("/")[1])
+                    const year = parseInt(bet.expires.split("/")[2])
 
-                        return (
-                            <li key={i} className="bet">
-                                <div className="bet-text">
-                                    <p className="bet-text-left">Bet: </p>
-                                    <p className="bet-text-right">{bet.text}</p>
-                                </div>
-                                <div className="bet-text">
-                                    <p className="bet-text-left">Amount: </p>
-                                    <p className="bet-text-right">{bet.amount} Tokens</p>
-                                </div>
-                                <div className="bet-text">
-                                    <p className="bet-text-left">Expires: </p>
-                                    {todaysDate === bet.expires ? 
-                                        <p className="today">Today</p>
-                                    : year === todaysYear && month === todaysMonth && day === todaysDay + 1 ?
-                                        <p className="tomorrow">Tomorrow</p>    
-                                    : <p className="bet-text-right">{bet.expires}</p>
-                                    }
-                                </div>
-                            </li>
-                        )
-                    })
+                    return (
+                        <li key={i} className="bet">
+                            <div className="bet-text">
+                                <p className="bet-text-left">Bet: </p>
+                                <p className="bet-text-right">{bet.text}</p>
+                            </div>
+                            <div className="bet-text">
+                                <p className="bet-text-left">Amount: </p>
+                                <p className="bet-text-right">{bet.amount} Tokens</p>
+                            </div>
+                            <div className="bet-text">
+                                <p className="bet-text-left">Expires: </p>
+                                {todaysDate === bet.expires ? 
+                                    <p className="today">Today</p>
+                                : year === todaysYear && month === todaysMonth && day === todaysDay + 1 ?
+                                    <p className="tomorrow">Tomorrow</p>    
+                                : <p className="bet-text-right">{bet.expires}</p>
+                                }
+                            </div>
+                        </li>
+                    )
+                })
                 : null
             }
         </ul>

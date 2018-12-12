@@ -5,7 +5,6 @@ const PlaceBet = (
     placeBet,
     bettingInput,
     monetaryValueOfBet,
-    allBets,
     dayBetComplete,
     yearBetComplete,
     todaysMonth,
@@ -81,16 +80,6 @@ const PlaceBet = (
                 <button type="submit" className="modal-button light-blue">Place Bet</button>
             </form>
 
-            <ul>
-                {allBets !== 0 ? 
-                allBets.map((bet, i) => {
-                    return (
-                        <li key={i}>{bet.bet}, {bet.value}</li>
-                    )
-                })
-                : null }
-                
-            </ul>
         </section>
     )
 }

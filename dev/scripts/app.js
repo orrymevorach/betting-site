@@ -5,9 +5,8 @@ import Rankings from './ColumnLeft/Rankings';
 import TrendingBets from './ColumnLeft/TrendingBets';
 import HomeNav from './ColumnMiddle/HomeNav';
 import PlaceBet from './ColumnMiddle/PlaceBet';
-import SectionExpiringBets from './ColumnMiddle/SectionExpiringBets';
+import SectionAllBets from './ColumnMiddle/SectionAllBets';
 import SectionNewestBets from './ColumnMiddle/SectionNewestBets';
-import SectionSports from './ColumnMiddle/SectionSports';
 import Tabs from './ColumnMiddle/Tabs';
 import BetSlip from './ColumnRight/BetSlip';
 import Footer from './Footer'
@@ -70,26 +69,23 @@ class App extends React.Component {
     this.loginWithEmail = this.loginWithEmail.bind(this)
     this.facebookAdditionalUserInformation = this.facebookAdditionalUserInformation.bind(this)
     this.placeBet = this.placeBet.bind(this)
+    this.acceptBet = this.acceptBet.bind(this)
   }
-
+  
+  // As soon as component loads, pull all bets from firebase and store them in state
   componentDidMount() {
-    // const allBetsArray = []
+    let newArray = []
+    
+    dbRefBets.on('value', snapshot => {
+      const data = snapshot.val();
+      for(let key in data) {
+        newArray.push(data[key])
+      }
+    })
 
-    // dbRefBets.on('value', snapshot => {
-    //   const data = snapshot.val();
-      
-    //   for(let key in data) {
-    //     console.log(data[key])
-    //     allBetsArray.push(data[key])
-    //   }
-    // })
-    // console.log(allBetsArray)
-    // dbRefBets.set(allBetsArray)
-
-    // this.setState({
-    //   allBets: allBetsArray
-    // })
-
+    this.setState({
+      allBets: newArray
+    })
   }
 
   handleChange(e) {
@@ -344,11 +340,34 @@ class App extends React.Component {
     dbRefUsers.child(`${userID}`).child('bets').child('activeBets').set(userProfile.bets.activeBets)
   }
 
-  renderToNewestBets(betText, amount, date) {
+  renderToAllBets(betText, amount, date) {
+    const userID = this.state.userProfile.userID
+    const username = this.state.userProfile.username
+    const day = new Date();
+    let hours = day.getHours();
+    const minutes = day.getMinutes();
+    let amPM;
+
+    if(hours > 12) {
+      hours = hours - 12
+      amPM = 'PM'
+    }
+    else {
+      amPM = 'AM'
+    }
+
+    const time = `${hours}:${minutes}${amPM}`
+
     const newBet = {
+      userPlaced: `${userID} / ${username}`,
+      datePlaced: date,
+      timePlaced: time,
+      userAccepted: '',
+      dateAccepted: '',
+      timeAccepted: '',
       bet: betText,
-      value: amount,
-      dateBetExpires: date
+      amount: amount,
+      expires: date
     }
 
     let currentBets = this.state.allBets
@@ -365,44 +384,17 @@ class App extends React.Component {
       allBetsCopy.push(newBet)
     }
 
+    dbRefBets.set(allBetsCopy)
+
     this.setState({
       bettingInput: '',
       monetaryValueOfBet: '',
       dayBetComplete: '',
       yearBetComplete: '',
+      allBets: allBetsCopy
     })
   }
 
-  storeBetInFirebase(betText, amount, date) {
-    const userID = this.state.userProfile.userID
-    const username = this.state.userProfile.username
-    const timeDatePlaced = new Date();
-
-    console.log(timeDatePlaced)
-
-    const newBet = {
-      userPlaced: `${userID}/${username}`,
-      datePlaced: timeDatePlaced,
-      userAccepted: '',
-      dateAccepted: '',
-      betText: betText,
-      amount: amount,
-      expires: date
-    }
-
-    const allBetsArray = []
-
-    dbRefBets.on('value', snapshot => {
-      const data = snapshot.val();
-      for (let key in data) {
-        allBetsArray.push(data[key])
-      }
-    })
-
-    allBetsArray.push(newBet)
-
-    dbRefBets.set(allBetsArray)
-  }
   placeBet(e) {
     e.preventDefault();
 
@@ -412,26 +404,60 @@ class App extends React.Component {
     const month = el[2].value
     const day = el[3].value
     const year = el[4].value
-    // const monthinNumbers =
-    //   month.split(" ")[0] === 'January' ? 1
-    //   : month.split(" ")[0] === 'February' ? 2
-    //   : month.split(" ")[0] === 'March' ? 3
-    //   : month.split(" ")[0] === 'April' ? 4
-    //   : month.split(" ")[0] === 'May' ? 5
-    //   : month.split(" ")[0] === 'June' ? 6
-    //   : month.split(" ")[0] === 'July' ? 7
-    //   : month.split(" ")[0] === 'August' ? 8
-    //   : month.split(" ")[0] === 'September' ? 9
-    //   : month.split(" ")[0] === 'October' ? 10
-    //   : month.split(" ")[0] === 'November' ? 11
-    //   : month.split(" ")[0] === 'December' ? 12
-    //   : null
     const dateInNumbers = `${month}/${day}/${year}`
 
     this.renderToBetSlip(betText, amount, dateInNumbers)
-    this.renderToNewestBets(betText, amount, dateInNumbers)
-    this.storeBetInFirebase(betText, amount, dateInNumbers)
+    this.renderToAllBets(betText, amount, dateInNumbers)
 
+  }
+
+  acceptBet(amount, bet, datePlaced, expires, timePlaced, userPlaced) {
+    const userID = this.state.userProfile.userID
+    const username = this.state.userProfile.username
+    const day = new Date();
+    let hours = day.getHours();
+    const minutes = day.getMinutes();
+    let amPM;
+
+    if (hours > 12) {
+      hours = hours - 12
+      amPM = 'PM'
+    }
+    else {
+      amPM = 'AM'
+    }
+
+    const timeAccepted = `${hours}:${minutes}${amPM}`
+
+    const newBet = {
+      userPlaced: userPlaced,
+      datePlaced: datePlaced,
+      timePlaced: timePlaced,
+      userAccepted: `${userID} / ${username}`,
+      dateAccepted: todaysDate,
+      timeAccepted: timeAccepted,
+      bet: bet,
+      amount: amount,
+      expires: expires
+    }
+
+    let currentBets = this.state.allBets
+    const allBetsCopy = []
+
+    
+    for (let i = 0; i < currentBets.length; i++) {
+      const pastBet = currentBets[i]
+      if(pastBet.amount === amount && pastBet.bet === bet && pastBet.datePlaced === datePlaced && pastBet.expires === expires && pastBet.timePlaced === timePlaced && pastBet.userPlaced === userPlaced) {
+        allBetsCopy.push(newBet)
+      }
+      else {
+        allBetsCopy.push(pastBet)
+      }
+    }
+
+    dbRefBets.set(allBetsCopy)
+
+    this.setState({ allBets: allBetsCopy })
   }
 
   render() {
@@ -491,8 +517,13 @@ class App extends React.Component {
 
                 <Route path="/" exact render={() => {
                   return (
-                    <SectionExpiringBets 
+                    <SectionAllBets 
                       allBets={this.state.allBets}
+                      todaysMonth={todaysMonth}
+                      todaysDay={todaysDay}
+                      todaysYear={todaysYear}
+                      username={this.state.userProfile.username}
+                      acceptBet={this.acceptBet}
                     />
                   )
                 }} />
