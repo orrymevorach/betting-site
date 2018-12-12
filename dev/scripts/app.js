@@ -23,20 +23,35 @@ const config = {
 };
 firebase.initializeApp(config);
 
+// Firebase Global Variables
 const dbRefUsers = firebase.database().ref('users')
 const dbRefBets = firebase.database().ref('allBets')
 
-// Todays Date
-const date = new Date();
-const todaysYear = date.getFullYear();
-const todaysMonth = date.getMonth() + 1;
-const todaysDay = date.getDate();
-const todaysDate = `${todaysMonth}/${todaysDay}/${todaysYear}`;
+// Boilerplate for Bet
+let betBoiler = {
+  userPlaced: '',
+  datePlaced: '',
+  timePlaced: '',
+  userAccepted: '',
+  dateAccepted: '',
+  timeAccepted: '',
+  bet: '',
+  amount: '',
+  expires: '',
+  status: ''
+}
 
 class App extends React.Component {
   constructor() {
     super()
     this.state = {
+      // Todays Date
+      todaysDate: {
+        date: '',
+        month: '',
+        day: '',
+        year: ''
+      },
       // Login Inputs
       loginEmail: '',
       loginPassword: '',
@@ -72,7 +87,9 @@ class App extends React.Component {
     this.acceptBet = this.acceptBet.bind(this)
   }
   
-  // As soon as component loads, pull all bets from firebase and store them in state
+  // As soon as component mounts: 
+    // 1. Pull all bets from firebase and store them in state
+    // 2. Store todays date in state
   componentDidMount() {
     let newArray = []
     
@@ -86,6 +103,8 @@ class App extends React.Component {
     this.setState({
       allBets: newArray
     })
+
+    this.getTodaysDate()
   }
 
   handleChange(e) {
@@ -344,35 +363,13 @@ class App extends React.Component {
     })
   }
 
-  addBetToBetSlip(betText, amount, date) {
-    
-    // New Bet
-    const newBet = {
-      "text": betText,
-      "amount": amount,
-      "expires": date
-    }
-
-    // A new object copying exact values of UserProfile
-    let userProfile = Object.assign({}, this.state.userProfile);
-
-    // Add new bet to User Profile
-    userProfile.bets.activeBets.push(newBet)
-
-    // push to firebase
-    const userID = this.state.userProfile.userID
-    dbRefUsers.child(`${userID}`).child('bets').child('activeBets').set(userProfile.bets.activeBets)
-  }
-
-  addBetToAllBets(betText, amount, date) {
-    const userID = this.state.userProfile.userID
-    const username = this.state.userProfile.username
+  getCurrentTime() {
     const day = new Date();
     let hours = day.getHours();
     const minutes = day.getMinutes();
     let amPM;
 
-    if(hours > 12) {
+    if (hours > 12) {
       hours = hours - 12
       amPM = 'PM'
     }
@@ -382,18 +379,42 @@ class App extends React.Component {
 
     const time = `${hours}:${minutes}${amPM}`
 
-    const newBet = {
-      userPlaced: `${userID} / ${username}`,
-      datePlaced: date,
-      timePlaced: time,
-      userAccepted: '',
-      dateAccepted: '',
-      timeAccepted: '',
-      bet: betText,
-      amount: amount,
-      expires: date
+    return time;
+  }
+
+  getTodaysDate() {
+    const date = new Date();
+    const todaysYear = date.getFullYear();
+    const todaysMonth = date.getMonth() + 1;
+    const todaysDay = date.getDate();
+    const todaysDate = `${todaysMonth}/${todaysDay}/${todaysYear}`;
+
+    const today = {
+      date: todaysDate,
+      month: todaysMonth,
+      day: todaysDay,
+      year: todaysYear
     }
 
+    this.setState({
+      todaysDate: today
+    })
+
+  }
+
+  addBetToBetSlip(newBet, userID) {
+    // A new object copying exact values of UserProfile
+    let userProfile = Object.assign({}, this.state.userProfile);
+
+    console.log(userProfile)
+    // Add new bet to User Profile
+    userProfile.bets.inactiveBets.push(newBet)
+
+    // push to firebase
+    dbRefUsers.child(`${userID}`).child('bets').child('inactiveBets').set(userProfile.bets.inactiveBets)
+  }
+
+  addBetToAllBets(newBet) {
     let currentBets = this.state.allBets
     const allBetsCopy = []
 
@@ -425,49 +446,51 @@ class App extends React.Component {
     const el = e.target
     const betText = el[0].value
     const amount = el[1].value
-    const month = el[2].value
-    const day = el[3].value
-    const year = el[4].value
-    const dateInNumbers = `${month}/${day}/${year}`
+    const monthExpires = el[2].value
+    const dayExpires = el[3].value
+    const yearExpires = el[4].value
+    const dateExpires = `${monthExpires}/${dayExpires}/${yearExpires}`
+    const userID = this.state.userProfile.userID
+    const username = this.state.userProfile.username
+    const time = this.getCurrentTime()
+    const date = this.state.todaysDate.date
 
-    this.addBetToBetSlip(betText, amount, dateInNumbers)
-    this.addBetToAllBets(betText, amount, dateInNumbers)
+    const newBet = Object.assign({}, betBoiler)
+
+    newBet.userPlaced = `${userID} / ${username}`
+    newBet.datePlaced = date
+    newBet.timePlaced = time
+    newBet.bet = betText
+    newBet.amount = amount
+    newBet.expires = dateExpires
+    newBet.status = 'Inactive'
+
+    this.addBetToBetSlip(newBet, userID)
+    this.addBetToAllBets(newBet)
 
   }
 
-  acceptBet(amount, bet, datePlaced, expires, timePlaced, userPlaced) {
+  acceptBet(bet) {
     const userID = this.state.userProfile.userID
     const username = this.state.userProfile.username
-    const day = new Date();
-    let hours = day.getHours();
-    const minutes = day.getMinutes();
-    let amPM;
+    const timeAccepted = this.getCurrentTime()
+    const todaysDate = this.state.todaysDate.date
 
-    if (hours > 12) {
-      hours = hours - 12
-      amPM = 'PM'
-    }
-    else {
-      amPM = 'AM'
-    }
+    const newBet = Object.assign({}, betBoiler)
 
-    const timeAccepted = `${hours}:${minutes}${amPM}`
-
-    const newBet = {
-      userPlaced: userPlaced,
-      datePlaced: datePlaced,
-      timePlaced: timePlaced,
-      userAccepted: `${userID} / ${username}`,
-      dateAccepted: todaysDate,
-      timeAccepted: timeAccepted,
-      bet: bet,
-      amount: amount,
-      expires: expires
-    }
+    newBet.userPlaced = bet.userPlaced
+    newBet.datePlaced = bet.datePlaced
+    newBet.timePlaced = bet.timePlaced
+    newBet.userAccepted = `${userID} / ${username}`
+    newBet.dateAccepted = todaysDate
+    newBet.timeAccepted = timeAccepted
+    newBet.bet = bet.bet
+    newBet.amount = bet.amount
+    newBet.expires = bet.expires
+    newBet.status = 'Active'
 
     let currentBets = this.state.allBets
     const allBetsCopy = []
-
     
     for (let i = 0; i < currentBets.length; i++) {
       const pastBet = currentBets[i]
@@ -481,7 +504,14 @@ class App extends React.Component {
 
     dbRefBets.set(allBetsCopy)
 
-    this.setState({ allBets: allBetsCopy })
+    // A new object copying exact values of UserProfile
+    let userProfile = Object.assign({}, this.state.userProfile);
+
+    // Add new bet to User Profile
+    userProfile.bets.activeBets.push(newBet)
+
+    // push to firebase
+    dbRefUsers.child(`${userID}`).child('bets').child('activeBets').set(userProfile.bets.activeBets)
   }
 
   render() {
@@ -528,9 +558,9 @@ class App extends React.Component {
                 allBets={this.state.allBets}
                 dayBetComplete={this.state.dayBetComplete}
                 yearBetComplete={this.state.yearBetComplete}
-                todaysMonth={todaysMonth}
-                todaysDay={todaysDay}
-                todaysYear={todaysYear}
+                todaysMonth={this.state.todaysDate.month}
+                todaysDay={this.state.todaysDate.day}
+                todaysYear={this.state.todaysDate.year}
               />
               : null
             }
@@ -543,9 +573,9 @@ class App extends React.Component {
                   return (
                     <SectionAllBets 
                       allBets={this.state.allBets}
-                      todaysMonth={todaysMonth}
-                      todaysDay={todaysDay}
-                      todaysYear={todaysYear}
+                      todaysMonth={this.state.todaysDate.month}
+                      todaysDay={this.state.todaysDate.day}
+                      todaysYear={this.state.todaysDate.year}
                       username={this.state.userProfile.username}
                       acceptBet={this.acceptBet}
                     />
@@ -564,10 +594,11 @@ class App extends React.Component {
             {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ?
             <BetSlip 
               userBets={this.state.userProfile.bets}
-              todaysDate={todaysDate}
-              todaysMonth={todaysMonth}
-              todaysDay={todaysDay}
-              todaysYear={todaysYear}
+              userID={this.state.userProfile.userID}
+              todaysDate={this.state.todaysDate.date}
+              todaysMonth={this.state.todaysDate.month}
+              todaysDay={this.state.todaysDate.day}
+              todaysYear={this.state.todaysDate.year}
             />
             : null
             }

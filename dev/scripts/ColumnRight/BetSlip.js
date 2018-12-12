@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
 import ActiveBets from './ActiveBets';
+import InactiveBets from './InactiveBets';
 import ExpiredBets from './ExpiredBets';
 
 const BetSlip = (
     { userBets, 
+    userID,
     todaysDate,
     todaysMonth,
     todaysDay,
@@ -20,8 +22,9 @@ const BetSlip = (
             <Router>
                 <div>
                     <ul className="betslip-tabs">
-                        <li className="tab"><NavLink to="/" exact activeClassName="active-bet-tab"><h2>Active Bets</h2></NavLink></li>
-                        <li className="tab"><NavLink to="/userExpiringBets" exact activeClassName="active-bet-tab"><h2>Expired Bets</h2></NavLink></li>
+                        <li className="tab"><NavLink to="/" exact activeClassName="active-bet-tab">Active Bets</NavLink></li>
+                        <li className="tab"><NavLink to="/userInactiveBets" exact activeClassName="active-bet-tab">Inactive Bets</NavLink></li>
+                        <li className="tab"><NavLink to="/userExpiringBets" exact activeClassName="active-bet-tab">Expired Bets</NavLink></li>
                     </ul>    
                 
                     <div className="bets-section">
@@ -29,6 +32,19 @@ const BetSlip = (
                             return (
                                 <ActiveBets 
                                     userBets={userBets}
+                                    userID={userID}
+                                    todaysDate={todaysDate}
+                                    todaysMonth={todaysMonth}
+                                    todaysDay={todaysDay}
+                                    todaysYear={todaysYear}
+                                />
+                            )
+                        }} />
+                        <Route path="/userInactiveBets" exact render={() => {
+                            return (
+                                <InactiveBets
+                                    userBets={userBets}
+                                    userID={userID}
                                     todaysDate={todaysDate}
                                     todaysMonth={todaysMonth}
                                     todaysDay={todaysDay}
@@ -40,6 +56,7 @@ const BetSlip = (
                             return (
                                 <ExpiredBets
                                     userBets={userBets}
+                                    userID={userID}
                                     todaysDate={todaysDate}
                                     todaysMonth={todaysMonth}
                                     todaysDay={todaysDay}

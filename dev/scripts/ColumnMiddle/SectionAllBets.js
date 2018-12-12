@@ -50,7 +50,7 @@ const SectionAllBets = (
                                 </div>
                                 }
                                 {/* {username != placedBy ? <button>Accept Bet</button> : null} */}
-                                <button onClick={() => acceptBet(bet.amount, bet.bet, bet.datePlaced, bet.expires, bet.timePlaced, bet.userPlaced)}>Accept Bet</button>
+                                <button onClick={() => acceptBet(bet)}>Accept Bet</button>
                                 
                                 
                             </li>
