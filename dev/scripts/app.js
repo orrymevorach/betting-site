@@ -270,7 +270,12 @@ class App extends React.Component {
           "username": username,
           "email": email,
           "userID": user.user.uid,
-          "loginMethod": "email"
+          "loginMethod": "email",
+          "bets": {
+            "activeBets": [],
+            "inactiveBets": [],
+            "expiredBets": []
+          }
         }
 
       this.setState({
@@ -296,17 +301,36 @@ class App extends React.Component {
     firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
       const userID = user.user.uid
       const dbRefUser = firebase.database().ref(`users/${userID}`)
+      let userProfile; 
       
-      let userProfile =
-      {
-        "username": '',
-        "userID": '',
-      }
       dbRefUser.on('value', snapshot => {
         const data = snapshot.val()
-        userProfile.username = data.username
-        userProfile.userID = data.userID
-        
+        const username = data.username
+        if(data.bets) {
+          const activeBets = data.bets.activeBets
+          const inactiveBets = data.bets.inactiveBets
+          const expiredBets = data.bets.expiredBets
+          userProfile = {
+            "username": username,
+            "userID": userID,
+            "bets": {
+              "activeBets": activeBets,
+              "inactiveBets": inactiveBets,
+              "expiredBets": expiredBets
+            }
+          }
+        }
+        else {
+          userProfile = {
+            "username": username,
+            "userID": userID,
+            "bets": {
+              "activeBets": [],
+              "inactiveBets": [],
+              "expiredBets": []
+            }
+          }
+        }
         this.setState({
           loggedInWithEmail: true,
           userProfile: userProfile
@@ -320,7 +344,7 @@ class App extends React.Component {
     })
   }
 
-  renderToBetSlip(betText, amount, date) {
+  addBetToBetSlip(betText, amount, date) {
     
     // New Bet
     const newBet = {
@@ -340,7 +364,7 @@ class App extends React.Component {
     dbRefUsers.child(`${userID}`).child('bets').child('activeBets').set(userProfile.bets.activeBets)
   }
 
-  renderToAllBets(betText, amount, date) {
+  addBetToAllBets(betText, amount, date) {
     const userID = this.state.userProfile.userID
     const username = this.state.userProfile.username
     const day = new Date();
@@ -406,8 +430,8 @@ class App extends React.Component {
     const year = el[4].value
     const dateInNumbers = `${month}/${day}/${year}`
 
-    this.renderToBetSlip(betText, amount, dateInNumbers)
-    this.renderToAllBets(betText, amount, dateInNumbers)
+    this.addBetToBetSlip(betText, amount, dateInNumbers)
+    this.addBetToAllBets(betText, amount, dateInNumbers)
 
   }
 
