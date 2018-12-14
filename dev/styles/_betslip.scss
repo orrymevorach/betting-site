@@ -19,7 +19,7 @@ ul.betslip-tabs {
         a {
             color: $darkBlue;
             font-family: 'Archivo Narrow', sans-serif; 
-            font-size: 13px;
+            font-size: 18px;
         }
 
     }
@@ -36,7 +36,7 @@ ul.betslip-tabs {
     text-decoration: underline;
 }
 
-.bet-text {
+.flex {
     display: flex;
 }
 
@@ -60,9 +60,30 @@ li.bet {
 
 .today {
     color: green;
-    font-weight: 500;
 }
 
 .tomorrow {
     color: orange;
+}
+
+.expired {
+    color: red;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: space-around;
+}
+.winner-button {
+    border: none;
+    padding: 10px 15px;
+    color: white;
+}
+
+.user-placed-button {
+    background-color: $lightBlue;
+}
+
+.user-accepted-button {
+    background-color: $darkBlue;
 }

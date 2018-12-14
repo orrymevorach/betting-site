@@ -7,6 +7,7 @@
     transform: translateX(-50%);
     top: 50px;
     color: #152a47;
+    z-index: 10;
 }
 
 // Modal Header Text
@@ -22,7 +23,7 @@
     color: #fff;
     width: 100%;
     border: none;
-    padding: 30px;
+    padding: 25px 30px;
 }
 
 // Modal Row
@@ -91,7 +92,7 @@ input:required {
 // Styles for Input with Labels inside container
 .label-inside {
     .input-container {
-        width: 500px;
+        width: 450px;
         border: 1px solid lightgray;
         padding: 10px;
     }
@@ -103,7 +104,7 @@ input:required {
     
     input[type=email],
     input[type=password] {
-        height: 50px;
+        height: 40px;
         width: 100%;
         border: none;
     }

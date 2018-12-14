@@ -1,7 +1,8 @@
 import React from 'react';
 
 const ExpiredBets = (
-    { userBets,
+    { allBets,
+    userID,
     todaysDate,
     todaysMonth,
     todaysDay,
@@ -10,33 +11,30 @@ const ExpiredBets = (
     
     return (
         <ul>
-            {userBets ?
-                userBets.activeBets
+            {allBets ?
+                allBets
                     .filter(bet => {
                         const month = parseInt(bet.expires.split("/")[0])
                         const day = parseInt(bet.expires.split("/")[1])
                         const year = parseInt(bet.expires.split("/")[2])
 
-                        if (year === todaysYear && month === todaysMonth && day >= todaysDay) {
-                            return false;
-                        }
-                        else if (year === todaysYear && month === todaysMonth && day < todaysDay) {
-                            return true;
-                        }
-                        else if (year >= todaysYear && month > todaysMonth) {
-                            return false;
-                        }
-                        else if (year === todaysYear && month < todaysMonth) {
-                            return true;
-                        }
-                        else if (year >= todaysYear) {
-                            return false;
-                        }
-                        else if (year < todaysYear) {
-                            return true;
+                        // Check if bet is active
+                        const userPlacedID = bet.userPlaced.split(" / ")[0]
+                        const userAcceptedID = bet.userAccepted.split(" / ")[0]
+                        // check if the bet involves the user
+                        if (userPlacedID === userID || userAcceptedID === userID) {
+                            if (year === todaysYear && month === todaysMonth && day < todaysDay) {
+                                return true;
+                            }
+                            else if (year === todaysYear && month < todaysMonth) {
+                                return true;
+                            }
+                            else if (year < todaysYear) {
+                                return true;
+                            }
                         }
                         else {
-                            console.log(bet)
+                            return false;
                         }
                     })
                     .sort((a, b) => {
@@ -59,16 +57,16 @@ const ExpiredBets = (
                     .map((bet, i) => {
                         return (
                             <li key={i} className="bet">
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Bet: </p>
                                     <p className="bet-text-right">{bet.text}</p>
                                 </div>
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Amount: </p>
                                     <p className="bet-text-right">{bet.amount} Tokens</p>
                                 </div>
-                                <div className="bet-text">
-                                    <p className="bet-text-left">Expires: </p>
+                                <div className="flex">
+                                    <p className="bet-text-left expired">Expired: </p>
                                     {todaysDate === bet.expires ?
                                         <p className="bet-text-right">{bet.expires} <span className="today">Today</span></p>
                                         : <p className="bet-text-right">{bet.expires}</p>

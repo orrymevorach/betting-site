@@ -5,6 +5,7 @@
 @import 'placeBet';
 @import 'tabs';
 @import 'betslip';
+@import 'footer';
 
 h1,h2,h3,h4,h5,h6,p,a,ul,li {
     margin: 0;
@@ -14,6 +15,7 @@ h1,h2,h3,h4,h5,h6,p,a,ul,li {
 body {
     background-color: #152a47;
     color: white;
+    position: relative;
 }
 
 // font-family: 'Archivo Black', sans-serif;

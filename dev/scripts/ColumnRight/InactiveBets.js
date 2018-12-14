@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ActiveBets = (
-    { userBets,
+    { allBets,
         userID,
         todaysDate,
         todaysMonth,
@@ -10,33 +10,30 @@ const ActiveBets = (
     }) => {
     return (
         <ul>
-            {userBets.inactiveBets ?
-                userBets.inactiveBets
+            {allBets ?
+                allBets
                     .filter(bet => {
                         const month = parseInt(bet.expires.split("/")[0])
                         const day = parseInt(bet.expires.split("/")[1])
                         const year = parseInt(bet.expires.split("/")[2])
 
                         // Check if bet is active
-                        if (bet.status === 'Inactive') {
-                            // Check if bet is expired
-                            if (year === todaysYear && month === todaysMonth && day >= todaysDay) {
-                                return true;
-                            }
-                            else if (year === todaysYear && month === todaysMonth && day < todaysDay) {
-                                return false;
-                            }
-                            else if (year >= todaysYear && month > todaysMonth) {
-                                return true;
-                            }
-                            else if (year === todaysYear && month < todaysMonth) {
-                                return false;
-                            }
-                            else if (year >= todaysYear) {
-                                return true;
-                            }
-                            else if (year < todaysYear) {
-                                return false;
+                        const userPlacedID = bet.userPlaced.split(" / ")[0]
+                        const userAcceptedID = bet.userAccepted.split(" / ")[0]
+                        // check if the bet involves the user
+                        if (userPlacedID === userID || userAcceptedID === userID) {
+                            // Check if the bet has been accepted
+                            if (bet.status === 'Inactive') {
+                                // check if the bet has not yet expired
+                                if (year === todaysYear && month === todaysMonth && day >= todaysDay) {
+                                    return true;
+                                }
+                                else if (year >= todaysYear && month > todaysMonth) {
+                                    return true;
+                                }
+                                else if (year >= todaysYear) {
+                                    return true;
+                                }
                             }
                         }
                         else {
@@ -70,15 +67,15 @@ const ActiveBets = (
 
                         return (
                             <li key={i} className="bet">
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Bet: </p>
                                     <p className="bet-text-right">{bet.bet}</p>
                                 </div>
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Amount: </p>
                                     <p className="bet-text-right">{bet.amount} Tokens</p>
                                 </div>
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Expires: </p>
                                     {todaysDate === bet.expires ?
                                         <p className="today">Today</p>
@@ -87,14 +84,6 @@ const ActiveBets = (
                                             : <p className="bet-text-right">{bet.expires}</p>
                                     }
                                 </div>
-                                {/* <div className="bet-text">
-                                <p className="bet-text-left">Challenger:</p>
-                                {userID === userPlacedID ?
-                                <p className="bet-text-right">{bet.userAccepted}</p>
-                                : userID === userAcceptedID ?
-                                <p className="bet-text-right">{bet.userPlaced}</p>
-                                : null }
-                            </div> */}
                             </li>
                         )
                     })

@@ -6,7 +6,7 @@ const SectionAllBets = (
     todaysDay,
     todaysMonth,
     todaysYear,
-    username,
+    userID,
     acceptBet
 }) => {
     
@@ -18,7 +18,8 @@ const SectionAllBets = (
                         const month = parseInt(bet.expires.split("/")[0])
                         const day = parseInt(bet.expires.split("/")[1])
                         const year = parseInt(bet.expires.split("/")[2])
-                        const placedBy = bet.userPlaced.split(" / ")[1]
+                        const userPlaceduserID = bet.userPlaced.split(" / ")[0]
+                        const userPlacedusername = bet.userPlaced.split(" / ")[1]
 
                         return (
                             <li key={i} className="bet">
@@ -39,18 +40,18 @@ const SectionAllBets = (
                                             : <p className="bet-text-right">{bet.expires}</p>
                                     }
                                 </div>
-                                {username === placedBy ? 
+                                {userID === userPlaceduserID ? 
                                     <div className="bet-text">
                                         <p className="bet-text-left">Placed By: </p>
                                         <p className="bet-text-right">YOU!</p>
                                     </div>
                                 : <div className="bet-text">
                                     <p className="bet-text-left">Placed By: </p>
-                                    <p className="bet-text-right">{placedBy}</p>
+                                    <p className="bet-text-right">{userPlacedusername}</p>
                                 </div>
                                 }
-                                {/* {username != placedBy ? <button>Accept Bet</button> : null} */}
-                                <button onClick={() => acceptBet(bet)}>Accept Bet</button>
+                                {userID !== userPlaceduserID ? <button onClick={() => acceptBet(bet)}>Accept Bet</button> : null}
+                                
                                 
                                 
                             </li>

@@ -5,7 +5,7 @@ import InactiveBets from './InactiveBets';
 import ExpiredBets from './ExpiredBets';
 
 const BetSlip = (
-    { userBets, 
+    { allBets, 
     userID,
     todaysDate,
     todaysMonth,
@@ -31,7 +31,7 @@ const BetSlip = (
                         <Route path="/" exact render={() => {
                             return (
                                 <ActiveBets 
-                                    userBets={userBets}
+                                    allBets={allBets}
                                     userID={userID}
                                     todaysDate={todaysDate}
                                     todaysMonth={todaysMonth}
@@ -43,7 +43,7 @@ const BetSlip = (
                         <Route path="/userInactiveBets" exact render={() => {
                             return (
                                 <InactiveBets
-                                    userBets={userBets}
+                                    allBets={allBets}
                                     userID={userID}
                                     todaysDate={todaysDate}
                                     todaysMonth={todaysMonth}
@@ -55,7 +55,7 @@ const BetSlip = (
                         <Route path="/userExpiringBets" exact render={() => {
                             return (
                                 <ExpiredBets
-                                    userBets={userBets}
+                                    allBets={allBets}
                                     userID={userID}
                                     todaysDate={todaysDate}
                                     todaysMonth={todaysMonth}
