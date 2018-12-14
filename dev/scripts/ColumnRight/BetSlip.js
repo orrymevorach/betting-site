@@ -10,21 +10,36 @@ const BetSlip = (
     todaysDate,
     todaysMonth,
     todaysDay,
-    todaysYear
+    todaysYear,
+    selectWinner,
+    accountBalance
 }) => {
+
     return (
         <section className="betslip">
-            <div className="betslip-main-tab">
-                <i className="fas fa-receipt"></i>
-                <h2>Betslip</h2>
+            <div className="flex">
+                <div className="betslip-main-tab">
+                    <i className="fas fa-receipt"></i>
+                    <h2>Betslip</h2>
+                </div>
+                <div className="betslip-wallet"><h3>Balance: {accountBalance} Tokens</h3></div>
             </div>
             
             <Router>
                 <div>
                     <ul className="betslip-tabs">
-                        <li className="tab"><NavLink to="/" exact activeClassName="active-bet-tab">Active Bets</NavLink></li>
-                        <li className="tab"><NavLink to="/userInactiveBets" exact activeClassName="active-bet-tab">Inactive Bets</NavLink></li>
-                        <li className="tab"><NavLink to="/userExpiringBets" exact activeClassName="active-bet-tab">Expired Bets</NavLink></li>
+                        <li className="tab">
+                            <NavLink to="/" exact activeClassName="active-bet-tab">Active Bets</NavLink>
+                            <div className="notification notification1"></div>
+                        </li>
+                        <li className="tab">
+                            <NavLink to="/userInactiveBets" exact activeClassName="active-bet-tab">Inactive Bets</NavLink>
+                            <div className="notification notification2"></div>
+                        </li>
+                        <li className="tab">
+                            <NavLink to="/userExpiringBets" exact activeClassName="active-bet-tab">Expired Bets</NavLink>
+                            <div className="notification notification3"></div>
+                        </li>
                     </ul>    
                 
                     <div className="bets-section">
@@ -37,6 +52,7 @@ const BetSlip = (
                                     todaysMonth={todaysMonth}
                                     todaysDay={todaysDay}
                                     todaysYear={todaysYear}
+                                    selectWinner={selectWinner}
                                 />
                             )
                         }} />

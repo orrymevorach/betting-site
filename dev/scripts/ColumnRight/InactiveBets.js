@@ -6,7 +6,8 @@ const ActiveBets = (
         todaysDate,
         todaysMonth,
         todaysDay,
-        todaysYear
+        todaysYear,
+        checkLength
     }) => {
     return (
         <ul>
@@ -62,8 +63,6 @@ const ActiveBets = (
                         const month = parseInt(bet.expires.split("/")[0])
                         const day = parseInt(bet.expires.split("/")[1])
                         const year = parseInt(bet.expires.split("/")[2])
-                        // const userAcceptedID = bet.userAccepted.split(" / ")[0]
-                        // const userPlacedID = bet.userPlaced.split(" / ")[0]
 
                         return (
                             <li key={i} className="bet">

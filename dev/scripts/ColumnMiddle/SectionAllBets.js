@@ -23,15 +23,15 @@ const SectionAllBets = (
 
                         return (
                             <li key={i} className="bet">
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Bet: </p>
                                     <p className="bet-text-right">{bet.bet}</p>
                                 </div>
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Amount: </p>
                                     <p className="bet-text-right">{bet.amount} Tokens</p>
                                 </div>
-                                <div className="bet-text">
+                                <div className="flex">
                                     <p className="bet-text-left">Expires: </p>
                                     {todaysDate === bet.expires ?
                                         <p className="today">Today</p>
@@ -41,11 +41,11 @@ const SectionAllBets = (
                                     }
                                 </div>
                                 {userID === userPlaceduserID ? 
-                                    <div className="bet-text">
+                                    <div className="flex">
                                         <p className="bet-text-left">Placed By: </p>
                                         <p className="bet-text-right">YOU!</p>
                                     </div>
-                                : <div className="bet-text">
+                                : <div className="flex">
                                     <p className="bet-text-left">Placed By: </p>
                                     <p className="bet-text-right">{userPlacedusername}</p>
                                 </div>

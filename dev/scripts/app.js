@@ -38,7 +38,9 @@ let betBoiler = {
   bet: '',
   amount: '',
   expires: '',
-  status: ''
+  status: '',
+  userPlacedSelectedWinner: '',
+  userAcceptedSelectedWinner: ''
 }
 
 class App extends React.Component {
@@ -86,6 +88,7 @@ class App extends React.Component {
     this.facebookAdditionalUserInformation = this.facebookAdditionalUserInformation.bind(this)
     this.placeBet = this.placeBet.bind(this)
     this.acceptBet = this.acceptBet.bind(this)
+    this.selectWinner = this.selectWinner.bind(this)
     // this.loadBets = this.loadBets.bind(this)
   }
   
@@ -143,9 +146,11 @@ class App extends React.Component {
             const activeBets = data.bets.activeBets ? data.bets.activeBets : []
             const inactiveBets = data.bets.inactiveBets ? data.bets.inactiveBets : []
             const expiredBets = data.bets.expiredBets ? data.bets.expiredBets : []
+            const accountBalance = data.accountBalance 
             userProfile = {
               "username": username,
               "userID": userID,
+              "accountBalance": accountBalance,
               "bets": {
                 "activeBets": activeBets,
                 "inactiveBets": inactiveBets,
@@ -158,6 +163,7 @@ class App extends React.Component {
             userProfile = {
               "username": username,
               "userID": userID,
+              "accountBalance": accountBalance,
               "bets": {
                 "activeBets":[],
                 "inactiveBets":[],
@@ -182,6 +188,7 @@ class App extends React.Component {
             "userID": userID,
             "firstName": firstName,
             "lastName": lastName,
+            "accountBalance": 50
           }
 
           // create a user in firebase and set the userProfile with current information
@@ -294,6 +301,7 @@ class App extends React.Component {
           "email": email,
           "userID": user.user.uid,
           "loginMethod": "email",
+          "accountBalance": 50,
           "bets": {
             "activeBets": [],
             "inactiveBets": [],
@@ -497,18 +505,10 @@ class App extends React.Component {
     const timeAccepted = this.getCurrentTime()
     const todaysDate = this.state.todaysDate.date
 
-    const newBet = Object.assign({}, betBoiler)
-
-    newBet.userPlaced = bet.userPlaced
-    newBet.datePlaced = bet.datePlaced
-    newBet.timePlaced = bet.timePlaced
-    newBet.userAccepted = `${userID} / ${username}`
-    newBet.dateAccepted = todaysDate
-    newBet.timeAccepted = timeAccepted
-    newBet.bet = bet.bet
-    newBet.amount = bet.amount
-    newBet.expires = bet.expires
-    newBet.status = 'Active'
+    bet.userAccepted = `${userID} / ${username}`
+    bet.dateAccepted = todaysDate
+    bet.timeAccepted = timeAccepted
+    bet.status = 'Active'
 
     let currentBets = this.state.allBets
     const allBetsCopy = []
@@ -521,7 +521,7 @@ class App extends React.Component {
         && pastBet.expires === bet.expires 
         && pastBet.timePlaced === bet.timePlaced 
         && pastBet.userPlaced === bet.userPlaced) {
-        allBetsCopy.push(newBet)
+        allBetsCopy.push(bet)
       }
       else {
         allBetsCopy.push(pastBet)
@@ -535,6 +535,61 @@ class App extends React.Component {
       })
     })
 
+  }
+
+  selectWinner(bet, selectedWinner) {
+    const currentBets = this.state.allBets
+    const userID = this.state.userProfile.userID
+    let allBetsCopy = []
+
+    const userPlacedUserID = bet.userPlaced.split(" / ")[0]
+    const userAcceptedUserID = bet.userAccepted.split(" / ")[0]
+    
+    
+    if (userID === userPlacedUserID) {
+      if(selectedWinner === bet.userPlaced) {
+        bet.userPlacedSelectedWinner = bet.userPlaced
+      }
+      else if(selectedWinner === bet.userAccepted) {
+        bet.userPlacedSelectedWinner = bet.userAccepted
+        bet.userAcceptedSelectedWinner = bet.userAccepted
+      }
+    }
+    else if (userID === userAcceptedUserID) {
+      if (selectedWinner === bet.userAccepted) {
+        bet.userAcceptedSelectedWinner = bet.userAccepted
+      }
+      else if (selectedWinner === bet.userPlaced) {
+        bet.userAcceptedSelectedWinner = bet.userPlaced
+        bet.userPlacedSelectedWinner = bet.userPlaced
+      }
+    }
+
+    // TO DO
+    // Update Account Balance for Winner and Loser!
+
+    for (let i = 0; i < currentBets.length; i++) {
+      const pastBet = currentBets[i]
+      if (pastBet.amount === bet.amount
+        && pastBet.bet === bet.bet
+        && pastBet.datePlaced === bet.datePlaced
+        && pastBet.expires === bet.expires
+        && pastBet.timePlaced === bet.timePlaced
+        && pastBet.userPlaced === bet.userPlaced) {
+        allBetsCopy.push(bet)
+      }
+      else {
+        allBetsCopy.push(pastBet)
+      }
+    }
+
+    dbRefBets.set(allBetsCopy)
+
+      .then(() => {
+        this.setState({
+          allBets: allBetsCopy
+        })
+      })
   }
 
   render() {
@@ -617,13 +672,14 @@ class App extends React.Component {
           <div className="home-col home-col3">
             {this.state.loggedInWithEmail === true || this.state.loggedInWithFacebook === true ?
             <BetSlip 
-              // userBets={this.state.userProfile.bets}
+              accountBalance={this.state.userProfile.accountBalance}
               allBets={this.state.allBets}
               userID={this.state.userProfile.userID}
               todaysDate={this.state.todaysDate.date}
               todaysMonth={this.state.todaysDate.month}
               todaysDay={this.state.todaysDate.day}
               todaysYear={this.state.todaysDate.year}
+              selectWinner={this.selectWinner}
             />
             : null
             }

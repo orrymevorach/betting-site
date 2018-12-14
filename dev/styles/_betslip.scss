@@ -16,6 +16,7 @@ ul.betslip-tabs {
         width: 100%;
         text-align: center;
         padding: 15px 0;
+        position: relative;
         a {
             color: $darkBlue;
             font-family: 'Archivo Narrow', sans-serif; 
@@ -86,4 +87,8 @@ li.bet {
 
 .user-accepted-button {
     background-color: $darkBlue;
+}
+
+.bet-main {
+    margin-top: 15px;
 }

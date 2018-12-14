@@ -6,7 +6,8 @@ const ActiveBets = (
     todaysDate,
     todaysMonth,
     todaysDay,
-    todaysYear
+    todaysYear,
+    selectWinner
  }) => {
     return (
         <ul>
@@ -67,7 +68,7 @@ const ActiveBets = (
                     const userPlacedID = bet.userPlaced.split(" / ")[0]
                     const userAcceptedusername = bet.userAccepted.split(" / ")[1]
                     const userPlacedusername = bet.userPlaced.split(" / ")[1]
-
+                    
                     return (
                         <li key={i} className="bet">
                             <div className="flex">
@@ -95,11 +96,28 @@ const ActiveBets = (
                                 <p className="bet-text-right">{userPlacedusername}</p>
                                 : null }
                             </div>
-                            <p>Who is the winner?</p>
-                            <div className="buttons-container">
-                                <button className="winner-button user-placed-button">{userPlacedusername}</button>
-                                <button className="winner-button user-accepted-button">{userAcceptedusername}</button>
+                            <div className="bet-main">
+                                {(userID === userPlacedID && bet.userPlacedSelectedWinner === '') || (userID === userAcceptedID && bet.userAcceptedSelectedWinner === '') ? 
+                                    <div>
+                                        <p>Who is the winner?</p>
+                                        <div className="buttons-container">
+                                            <button className="winner-button user-placed-button" onClick={() => selectWinner(bet, bet.userPlaced)}>{userPlacedusername}</button>
+                                            <button className="winner-button user-accepted-button" onClick={() => selectWinner(bet, bet.userAccepted)}>{userAcceptedusername}</button>
+                                        </div>
+                                    </div>
+                                // Current User Chose Self as Winner, Awaiting Opponents Response
+                                : (userID === userPlacedID && bet.userPlacedSelectedWinner === bet.userPlaced && bet.userAcceptedSelectedWinner === '') || (userID === userAcceptedID && bet.userAcceptedSelectedWinner === bet.userAccepted && bet.userPlacedSelectedWinner === '')? 
+                                    <p>So you think you're a winner eh?! If you're opponent agrees, {bet.amount} tokens will be added to your account!</p>
+                                // Current User Admits Defeat
+                                : (userID === userPlacedID && bet.userPlacedSelectedWinner === bet.userAccepted) || (userID === userAcceptedID && bet.userAcceptedSelectedWinner === bet.userPlaced) ?
+                                    <p>Sucks to suck buddy! {bet.amount} tokens will be deducted from your account.</p>
+                                // Current User Wins the Bet
+                                : (userID === userPlacedID && bet.userPlacedSelectedWinner === bet.userPlaced && bet.userAcceptedSelectedWinner === bet.userPlaced) || (userID === userAcceptedID && bet.userPlacedSelectedWinner === bet.userAccepted && bet.userAcceptedSelectedWinner === bet.userAccepted) ?
+                                    <p>Congrats! {bet.amount} tokens will be added to your account.</p>   
+                                : null }
                             </div>
+                        
+                            
                         </li>
                     )
                 })
