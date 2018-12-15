@@ -6,8 +6,9 @@
 @import 'tabs';
 @import 'betslip';
 @import 'footer';
+@import 'rankings';
 
-h1,h2,h3,h4,h5,h6,p,a,ul,li {
+h1,h2,h3,h4,h5,h6,p,a,ul,ol,li {
     margin: 0;
     padding: 0;
 }
@@ -64,6 +65,7 @@ ul {
     top: 0;
     right: 0;
     bottom: 0;
+    z-index: 10;
 }
 
 .display {

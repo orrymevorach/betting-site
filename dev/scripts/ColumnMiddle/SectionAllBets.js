@@ -7,19 +7,22 @@ const SectionAllBets = (
     todaysMonth,
     todaysYear,
     userID,
-    acceptBet
+    acceptBet,
+    accountBalance
 }) => {
     
     return (
         <div>
             <ul>
-                {allBets.length != 0 ? 
+                {allBets.length !== 0 ? 
                     allBets.map((bet, i) => {
                         const month = parseInt(bet.expires.split("/")[0])
                         const day = parseInt(bet.expires.split("/")[1])
                         const year = parseInt(bet.expires.split("/")[2])
                         const userPlaceduserID = bet.userPlaced.split(" / ")[0]
                         const userPlacedusername = bet.userPlaced.split(" / ")[1]
+                        const balance = parseInt(accountBalance, 10)
+                        const amount = parseInt(bet.amount, 10)
 
                         return (
                             <li key={i} className="bet">
@@ -50,10 +53,10 @@ const SectionAllBets = (
                                     <p className="bet-text-right">{userPlacedusername}</p>
                                 </div>
                                 }
-                                {userID !== userPlaceduserID ? <button onClick={() => acceptBet(bet)}>Accept Bet</button> : null}
-                                
-                                
-                                
+                                {userID !== userPlaceduserID && amount <= balance ? <button onClick={() => acceptBet(bet)}>Accept Bet</button> 
+                                : userID !== userPlaceduserID && amount > balance ?
+                                <p className="bet-text-left">Sorry Dawg. This bet is too rich for your blood</p>
+                                 : null}
                             </li>
                         )
                     })

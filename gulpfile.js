@@ -54,7 +54,7 @@ gulp.task('assets', () => {
 		.pipe(gulp.dest('./public/assets'))
 })
 
-gulp.task('default', ['bs', 'js', 'styles', 'index', 'assets'], () => {
+gulp.task('default', ['bs', 'js', 'styles', 'assets'], () => {
 	gulp.watch('dev/**/*.js', ['js']);
 	gulp.watch('dev/**/*.scss', ['styles']);
 	gulp.watch('./public/styles/style.css', reload);

@@ -110,10 +110,12 @@ const ActiveBets = (
                                     <p>So you think you're a winner eh?! If you're opponent agrees, {bet.amount} tokens will be added to your account!</p>
                                 // Current User Admits Defeat
                                 : (userID === userPlacedID && bet.userPlacedSelectedWinner === bet.userAccepted) || (userID === userAcceptedID && bet.userAcceptedSelectedWinner === bet.userPlaced) ?
-                                    <p>Sucks to suck buddy! {bet.amount} tokens will be deducted from your account.</p>
+                                    <p>Sucks to suck pussy! {bet.amount} tokens will be deducted from your account.</p>
                                 // Current User Wins the Bet
                                 : (userID === userPlacedID && bet.userPlacedSelectedWinner === bet.userPlaced && bet.userAcceptedSelectedWinner === bet.userPlaced) || (userID === userAcceptedID && bet.userPlacedSelectedWinner === bet.userAccepted && bet.userAcceptedSelectedWinner === bet.userAccepted) ?
-                                    <p>Congrats! {bet.amount} tokens will be added to your account.</p>   
+                                    <p>Congrats! {bet.amount} tokens will be added to your account and your penis will be extra girthy today.</p> 
+                                : bet.userPlacedSelectedWinner !== '' && bet.userAcceptedSelectedWinner !== '' && bet.userAcceptedSelectedWinner !== bet.userPlacedSelectedWinner ?
+                                <p>You do not agree on the winner! Both accounts will be locked for 24 hours</p>
                                 : null }
                             </div>
                         

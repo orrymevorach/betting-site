@@ -40,7 +40,9 @@ let betBoiler = {
   expires: '',
   status: '',
   userPlacedSelectedWinner: '',
-  userAcceptedSelectedWinner: ''
+  userAcceptedSelectedWinner: '',
+  winner: '',
+  loser: ''
 }
 
 class App extends React.Component {
@@ -89,7 +91,6 @@ class App extends React.Component {
     this.placeBet = this.placeBet.bind(this)
     this.acceptBet = this.acceptBet.bind(this)
     this.selectWinner = this.selectWinner.bind(this)
-    // this.loadBets = this.loadBets.bind(this)
   }
   
   // As soon as component mounts: 
@@ -97,7 +98,6 @@ class App extends React.Component {
     // 2. Store todays date in state
   componentDidMount() {
     let allBets = []
-    // let allUsers = []
     
     dbRefBets.on('value', snapshot => {
       const data = snapshot.val();
@@ -117,6 +117,110 @@ class App extends React.Component {
     this.setState({
       [e.target.name]: e.target.value
     })
+  }
+
+  createAccount(e) {
+    e.preventDefault();
+    const el = e.target
+    const title = el[0].value
+    const firstName = el[1].value
+    const lastName = el[2].value
+    const month = el[3].value
+    const day = el[4].value
+    const year = el[5].value
+    const username = el[6].value
+    const email = el[7].value
+    const password = el[8].value
+
+    firebase.auth().createUserWithEmailAndPassword(email, password).then((user) => {
+
+      const userProfile =
+      {
+        "title": title,
+        "firstName": firstName,
+        "lastName": lastName,
+        "birthday": `${month} ${day} ${year}`,
+        "username": username,
+        "email": email,
+        "userID": user.user.uid,
+        "loginMethod": "email",
+        "accountBalance": 50,
+        "bets": {
+          "activeBets": [],
+          "inactiveBets": [],
+          "expiredBets": []
+        }
+      }
+
+      this.setState({
+        loggedInWithEmail: true,
+        userProfile: userProfile
+      })
+
+      // Firebase
+      dbRefUsers.child(`${user.user.uid}`).set(userProfile)
+
+
+    }).catch(err => {
+      console.log(err)
+      alert(`${err.code}: ${err.message}`)
+    })
+    // this.loadBets();
+  }
+
+  loginWithEmail(e) {
+    e.preventDefault();
+    const email = e.target[0].value
+    const password = e.target[1].value
+
+    firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
+      const userID = user.user.uid
+      const dbRefUser = firebase.database().ref(`users/${userID}`)
+      let userProfile;
+      
+      dbRefUser.on('value', snapshot => {
+        const data = snapshot.val()
+        const username = data.username
+        const accountBalance = data.accountBalance 
+        if (data.bets) {
+          const activeBets = data.bets.activeBets
+          const inactiveBets = data.bets.inactiveBets
+          const expiredBets = data.bets.expiredBets
+          userProfile = {
+            "username": username,
+            "userID": userID,
+            "accountBalance": accountBalance,
+            "bets": {
+              "activeBets": activeBets,
+              "inactiveBets": inactiveBets,
+              "expiredBets": expiredBets
+            }
+          }
+        }
+        else {
+          userProfile = {
+            "username": username,
+            "userID": userID,
+            "accountBalance": accountBalance,
+            "bets": {
+              "activeBets": [],
+              "inactiveBets": [],
+              "expiredBets": []
+            }
+          }
+        }
+        this.setState({
+          loggedInWithEmail: true,
+          userProfile: userProfile
+        })
+
+      })
+
+    }).catch(err => {
+      console.log(err)
+      alert(`${err.code}: ${err.message}`)
+    })
+
   }
 
   loginWithFacebook() {
@@ -139,6 +243,7 @@ class App extends React.Component {
         if(snapshot.exists()) {
           const data = snapshot.val()
           const username = data.username
+          const accountBalance = data.accountBalance 
           let userProfile;
           
           // if bets have been made and exist within the object ...
@@ -146,7 +251,7 @@ class App extends React.Component {
             const activeBets = data.bets.activeBets ? data.bets.activeBets : []
             const inactiveBets = data.bets.inactiveBets ? data.bets.inactiveBets : []
             const expiredBets = data.bets.expiredBets ? data.bets.expiredBets : []
-            const accountBalance = data.accountBalance 
+            
             userProfile = {
               "username": username,
               "userID": userID,
@@ -187,8 +292,7 @@ class App extends React.Component {
             "email": userEmail,
             "userID": userID,
             "firstName": firstName,
-            "lastName": lastName,
-            "accountBalance": 50
+            "lastName": lastName
           }
 
           // create a user in firebase and set the userProfile with current information
@@ -230,6 +334,7 @@ class App extends React.Component {
       "email": '',
       "userID": userID,
       "loginMethod": "facebook",
+      "accountBalance": 50,
       "bets": {
         "activeBets": [],
         "inactiveBets": [],
@@ -276,123 +381,6 @@ class App extends React.Component {
     })
   }
 
-  createAccount(e) {
-    e.preventDefault();
-    const el = e.target
-    const title = el[0].value
-    const firstName = el[1].value
-    const lastName = el[2].value
-    const month = el[3].value
-    const day = el[4].value
-    const year = el[5].value
-    const username = el[6].value
-    const email = el[7].value
-    const password = el[8].value
-    
-    firebase.auth().createUserWithEmailAndPassword(email, password).then((user) => {
-      
-      const userProfile = 
-        {
-          "title": title,
-          "firstName": firstName,
-          "lastName": lastName,
-          "birthday": `${month} ${day} ${year}`,
-          "username": username,
-          "email": email,
-          "userID": user.user.uid,
-          "loginMethod": "email",
-          "accountBalance": 50,
-          "bets": {
-            "activeBets": [],
-            "inactiveBets": [],
-            "expiredBets": []
-          }
-        }
-
-      this.setState({
-        loggedInWithEmail: true,
-        userProfile: userProfile
-      })
-
-      // Firebase
-      dbRefUsers.child(`${user.user.uid}`).set(userProfile)
-      
-
-    }).catch(err => {
-      console.log(err)
-      alert(`${err.code}: ${err.message}`)
-    })
-    // this.loadBets();
-  }
-
-  loadBets() {
-    let allBets = []
-
-    dbRefBets.on('value', snapshot => {
-      const data = snapshot.val();
-      for(let key in data) {
-        allBets.push(data[key])
-      }
-    })
-
-    this.setState({
-      allBets: allBets
-    })
-  }
-
-  loginWithEmail(e) {
-    e.preventDefault();
-    const email = e.target[0].value
-    const password = e.target[1].value
-
-    firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
-      const userID = user.user.uid
-      const dbRefUser = firebase.database().ref(`users/${userID}`)
-      let userProfile; 
-      
-      dbRefUser.on('value', snapshot => {
-        const data = snapshot.val()
-        const username = data.username
-        if(data.bets) {
-          const activeBets = data.bets.activeBets
-          const inactiveBets = data.bets.inactiveBets
-          const expiredBets = data.bets.expiredBets
-          userProfile = {
-            "username": username,
-            "userID": userID,
-            "bets": {
-              "activeBets": activeBets,
-              "inactiveBets": inactiveBets,
-              "expiredBets": expiredBets
-            }
-          }
-        }
-        else {
-          userProfile = {
-            "username": username,
-            "userID": userID,
-            "bets": {
-              "activeBets": [],
-              "inactiveBets": [],
-              "expiredBets": []
-            }
-          }
-        }
-        this.setState({
-          loggedInWithEmail: true,
-          userProfile: userProfile
-        })
-
-      })
-      
-    }).catch(err => {
-      console.log(err)
-      alert(`${err.code}: ${err.message}`)
-    })
-
-    // this.loadBets();
-  }
-
   getCurrentTime() {
     const day = new Date();
     let hours = day.getHours();
@@ -432,16 +420,33 @@ class App extends React.Component {
 
   }
 
-  // addBetToBetSlip(newBet, userID) {
-  //   // A new object copying exact values of UserProfile
-  //   let userProfile = Object.assign({}, this.state.userProfile);
+  placeBet(e) {
+    e.preventDefault();
 
-  //   // Add new bet to User Profile
-  //   userProfile.bets.inactiveBets.push(newBet)
+    const el = e.target
+    const betText = el[0].value
+    const amount = el[1].value
+    const monthExpires = el[2].value
+    const dayExpires = el[3].value
+    const yearExpires = el[4].value
+    const dateExpires = `${monthExpires}/${dayExpires}/${yearExpires}`
+    const userID = this.state.userProfile.userID
+    const username = this.state.userProfile.username
+    const time = this.getCurrentTime()
+    const date = this.state.todaysDate.date
 
-  //   // push to firebase
-  //   dbRefUsers.child(userID).child('bets').child('inactiveBets').set(userProfile.bets.inactiveBets)
-  // }
+    const newBet = Object.assign({}, betBoiler)
+
+    newBet.userPlaced = `${userID} / ${username}`
+    newBet.datePlaced = date
+    newBet.timePlaced = time
+    newBet.bet = betText
+    newBet.amount = amount
+    newBet.expires = dateExpires
+    newBet.status = 'Inactive'
+
+    this.addBetToAllBets(newBet)
+  }
 
   addBetToAllBets(newBet) {
     let currentBets = this.state.allBets
@@ -469,34 +474,6 @@ class App extends React.Component {
         allBets: allBetsCopy
       })
     })
-  }
-
-  placeBet(e) {
-    e.preventDefault();
-
-    const el = e.target
-    const betText = el[0].value
-    const amount = el[1].value
-    const monthExpires = el[2].value
-    const dayExpires = el[3].value
-    const yearExpires = el[4].value
-    const dateExpires = `${monthExpires}/${dayExpires}/${yearExpires}`
-    const userID = this.state.userProfile.userID
-    const username = this.state.userProfile.username
-    const time = this.getCurrentTime()
-    const date = this.state.todaysDate.date
-
-    const newBet = Object.assign({}, betBoiler)
-
-    newBet.userPlaced = `${userID} / ${username}`
-    newBet.datePlaced = date
-    newBet.timePlaced = time
-    newBet.bet = betText
-    newBet.amount = amount
-    newBet.expires = dateExpires
-    newBet.status = 'Inactive'
-
-    this.addBetToAllBets(newBet)
   }
 
   acceptBet(bet) {
@@ -545,7 +522,6 @@ class App extends React.Component {
     const userPlacedUserID = bet.userPlaced.split(" / ")[0]
     const userAcceptedUserID = bet.userAccepted.split(" / ")[0]
     
-    
     if (userID === userPlacedUserID) {
       if(selectedWinner === bet.userPlaced) {
         bet.userPlacedSelectedWinner = bet.userPlaced
@@ -553,6 +529,8 @@ class App extends React.Component {
       else if(selectedWinner === bet.userAccepted) {
         bet.userPlacedSelectedWinner = bet.userAccepted
         bet.userAcceptedSelectedWinner = bet.userAccepted
+        bet.winner = bet.userAccepted
+        bet.loser = bet.userPlaced
       }
     }
     else if (userID === userAcceptedUserID) {
@@ -562,11 +540,10 @@ class App extends React.Component {
       else if (selectedWinner === bet.userPlaced) {
         bet.userAcceptedSelectedWinner = bet.userPlaced
         bet.userPlacedSelectedWinner = bet.userPlaced
+        bet.winner = bet.userPlaced
+        bet.loser = bet.userAccepted
       }
     }
-
-    // TO DO
-    // Update Account Balance for Winner and Loser!
 
     for (let i = 0; i < currentBets.length; i++) {
       const pastBet = currentBets[i]
@@ -590,6 +567,38 @@ class App extends React.Component {
           allBets: allBetsCopy
         })
       })
+
+    if(bet.winner !== '' && bet.loser !== '') {
+      const winnerUserID = bet.winner.split(" / ")[0]
+      const loserUserID = bet.loser.split(" / ")[0]
+      
+      // console.log(winnerUserID, loserUserID)
+      let winnersBalance;
+      let losersBalance;
+
+      dbRefUsers.on('value', snapshot => {
+        const data = snapshot.val()
+        for(let key in data) {
+          const user = data[key]
+
+          if(user.userID === winnerUserID) {
+            winnersBalance = parseInt(user.accountBalance) + parseInt(bet.amount)
+            console.log(winnersBalance)
+          }
+          else if (user.userID === loserUserID) {
+            losersBalance = parseInt(user.accountBalance) - parseInt(bet.amount)
+            console.log(losersBalance)
+          }
+        }
+        
+      })
+      // This is really hacky, find a better way to do this!!!!!!!!!!!!!
+      setTimeout(function() {
+          dbRefUsers.child(`${winnerUserID}`).child('accountBalance').set(winnersBalance)
+          dbRefUsers.child(`${loserUserID}`).child('accountBalance').set(losersBalance)
+      }, 3000)  
+    }
+
   }
 
   render() {
@@ -600,7 +609,9 @@ class App extends React.Component {
         <div className="home-container">
           <div className="home-col home-col1">
             <Logo />
-            <Rankings />
+            <Rankings 
+              dbRefUsers={dbRefUsers}
+            />
             <TrendingBets />
           </div>
           <div className="home-col home-col2">
@@ -639,6 +650,7 @@ class App extends React.Component {
                 todaysMonth={this.state.todaysDate.month}
                 todaysDay={this.state.todaysDate.day}
                 todaysYear={this.state.todaysDate.year}
+                accountBalance={this.state.userProfile.accountBalance}
               />
               : null
             }
@@ -657,6 +669,7 @@ class App extends React.Component {
                       todaysYear={this.state.todaysDate.year}
                       userID={this.state.userProfile.userID}
                       acceptBet={this.acceptBet}
+                      accountBalance={this.state.userProfile.accountBalance}
                     />
                   )
                 }} />

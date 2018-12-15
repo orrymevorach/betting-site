@@ -1,4 +1,5 @@
 import React from 'react';
+import BetLessModal from './BetLessModal';
 
 const PlaceBet = (
     { handleChange,
@@ -9,16 +10,26 @@ const PlaceBet = (
     yearBetComplete,
     todaysMonth,
     todaysDay,
-    todaysYear }
+    todaysYear,
+    accountBalance
+ }
 ) => {
-    $('button').on('mouseover', () => {
-        $('button:after').css({'display': 'block'})
-    })
+    function bet(e) {
+        e.preventDefault();
+        const amount = e.target[1].value
+        if(parseInt(amount) > parseInt(accountBalance)) {
+            $('.bet-less-modal').removeClass('none')
+        }
+        else {
+            placeBet(e)
+        }
+    }
 
     return (
         <section className="place-bet">
+            <BetLessModal />
             <h1>PlaceBet</h1>
-            <form onSubmit={(e) => placeBet(e)} className="label-outside">
+            <form onSubmit={(e) => bet(e)} className="label-outside">
                 <div className="bet row">
                     <label htmlFor="bettingInput">What Is Your Bet?</label>
                     <input
@@ -26,6 +37,7 @@ const PlaceBet = (
                         name="bettingInput"
                         value={bettingInput}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div className="row row2 clearfix">
@@ -36,13 +48,14 @@ const PlaceBet = (
                             name="monetaryValueOfBet"
                             value={monetaryValueOfBet}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div className="date-bet-complete date-inputs">
                         <label htmlFor="date-bet-complete">What Day Does Your Bet Take Place</label>
                         <div className="date-inputs">
                             <div className="select-arrow-container">
-                                <select name="monthBetComplete" className="month-input" defaultValue={todaysMonth}>
+                                <select name="monthBetComplete" className="month-input" defaultValue={todaysMonth} required>
                                     <option value="1">January</option>
                                     <option value="2">February</option>
                                     <option value="3">March</option>
@@ -64,7 +77,7 @@ const PlaceBet = (
                                 name="dayBetComplete"
                                 value={dayBetComplete || todaysDay }
                                 onChange={handleChange}
-                                // required
+                                required
                             />
                             <input
                                 className="year-input"
@@ -72,7 +85,7 @@ const PlaceBet = (
                                 name="yearBetComplete"
                                 value={yearBetComplete || todaysYear }
                                 onChange={handleChange}
-                                // required
+                                required
                             />
                         </div>
                     </div>
